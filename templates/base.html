@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/w3.css') }}">
+    <title>QR App 1.0</title>
+</head>
+<body>
+        <div class="w3-bar w3-indigo w3-container w3-padding" style="position: sticky;top: 0">
+            <h4>QR App 1.0</h4>
+        </div>
+        <div class="w3-container w3-padding">
+            {% block content%}
+            {% endblock %}
+            <center>
+                <hr/>
+                Copyright &copy; dd, 2025
+            </center>
+        </div>
+</body>
+</html>
