@@ -1,9 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
 from werkzeug.security import check_password_hash
 from datetime import datetime
-import qrcode
-from io import BytesIO
-import base64
 from dbhelper import *
 
 app = Flask(__name__)
@@ -65,20 +62,21 @@ def save_user():
     """Save or update user"""
     email = request.form.get('email')
     password = request.form.get('password')
+    name = request.form.get('name')
     user_id = request.form.get('user_id')
     
-    if not email or not password:
-        flash('Email and password are required', 'danger')
+    if not email or not password or not name:
+        flash('Email, name and password are required', 'danger')
         return redirect(url_for('user_management'))
     
     try:
         if user_id:
-            if update_user(user_id, email, password):
+            if update_user(user_id, email, password, name):
                 flash('User updated successfully!', 'success')
             else:
                 flash('Email already exists', 'danger')
         else:
-            if create_user(email, password):
+            if create_user(email, password, name):
                 flash('User created successfully!', 'success')
             else:
                 flash('Email already exists', 'danger')
@@ -166,6 +164,25 @@ def view_attendance():
     attendance = get_attendance_by_date(date_filter)
     return render_template('view_attendance.html', attendance=attendance, date_filter=date_filter)
 
+@app.route('/api/scan/<idno>')
+def scan_student(idno):
+    """Get student information by scanning QR code"""
+    student = get_student_by_idno(idno)
+    
+    if not student:
+        return jsonify({'success': False, 'message': 'Student not found'}), 404
+    
+    return jsonify({
+        'success': True,
+        'student': {
+            'idno': student['idno'],
+            'firstname': student['firstname'],
+            'lastname': student['lastname'],
+            'course': student['course'],
+            'level': student['level']
+        }
+    })
+
 @app.route('/api/attendance', methods=['POST'])
 def record_attendance_api():
     """Record attendance via QR code scan"""
@@ -184,26 +201,6 @@ def record_attendance_api():
         return jsonify({'success': True, 'message': f'Attendance recorded for {idno}'})
     else:
         return jsonify({'success': False, 'message': 'Error recording attendance'}), 500
-
-@app.route('/api/qrcode/<idno>')
-def generate_qrcode(idno):
-    """Generate QR code for student"""
-    qr = qrcode.QRCode(
-        version=1,
-        error_correction=qrcode.constants.ERROR_CORRECT_L,
-        box_size=10,
-        border=4,
-    )
-    qr.add_data(idno)
-    qr.make(fit=True)
-    
-    img = qr.make_image(fill_color="black", back_color="white")
-    
-    buffered = BytesIO()
-    img.save(buffered, format="PNG")
-    img_str = base64.b64encode(buffered.getvalue()).decode()
-    
-    return jsonify({'qrcode': f'data:image/png;base64,{img_str}'})
 
 @app.errorhandler(404)
 def page_not_found(e):

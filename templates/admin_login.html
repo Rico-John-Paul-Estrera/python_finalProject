@@ -1,29 +1,25 @@
 {% extends 'base.html' %}
 
-{% block content %}
+{% block content%}
 <br><br>
-<div class="w3-row">
-    <div class="w3-third">&nbsp;</div>
-    <div class="w3-third">
-        <div class="w3-card-4 w3-padding">
-            <center>
-                <h4 class="w3-text-indigo"><b>ADMIN LOGIN</b></h4>
-                <hr class="w3-border-indigo" style="width:80%;">
-            </center>
-            <form method="POST" action="{{ url_for('admin_login') }}">
-                <p>
-                    <input type="email" name="email" class="w3-input w3-border" placeholder="email" required>
-                </p>
-                <p>
-                    <input type="password" name="password" class="w3-input w3-border" placeholder="********" required>
-                </p>
-                <p class="w3-right">
-                    <button type="submit" class="w3-button w3-indigo">LOGIN</button>
-                </p>
-                <br><br>
-            </form>
-        </div>
+<div class="w3-container">
+    <div class="w3-card-4 w3-white" style="max-width: 400px; margin: 0 auto; padding: 30px;">
+        <center>
+            <h3 class="w3-text-indigo">ADMIN LOGIN</h3>
+            <hr class="w3-border-indigo" style="width: 50%;">
+        </center>
+        <form method="POST" action="{{ url_for('admin_login') }}">
+            <p>
+                <input type="email" name="email" class="w3-input w3-border" placeholder="email" required>
+            </p>
+            <p>
+                <input type="password" name="password" class="w3-input w3-border" placeholder="********" required>
+            </p>
+            <p class="w3-right">
+                <button type="submit" class="w3-button w3-indigo w3-round" style="min-width: 100px;">LOGIN</button>
+            </p>
+            <br><br>
+        </form>
     </div>
-    <div class="w3-third">&nbsp;</div>
 </div>
 {% endblock %}

@@ -1,37 +1,74 @@
 {% extends 'base.html' %}
 
 {% block navbar_right %}
-<a href="{{ url_for('admin_login') }}" class="w3-bar-item w3-button w3-right">LOGIN</a>
+<a href="{{ url_for('admin_login') }}" class="w3-bar-item w3-button w3-right w3-white w3-round">LOGIN</a>
 {% endblock %}
 
-{% block content %}
+{% block content%}
 <br>
-<center>
-    <div id="qr-reader" style="width:400px; height:300px; border:1px solid #c0c0c0;"></div>
-</center>
-{% endblock %}
+<div class="w3-center">
+    <h3>QRCode Reader Viewer</h3>
+    <div class="w3-card-4" style="max-width: 600px; margin: 0 auto; padding: 20px;">
+        <div id="reader" style="width: 100%;"></div>
+        <div id="result" class="w3-container w3-margin-top">
+            <div id="student-info" style="display: none;">
+                <center>
+                    <div class="w3-circle" style="width: 100px; height: 100px; background-color: #ccc; display: inline-flex; align-items: center; justify-content: center; margin: 20px;">
+                        <span style="font-size: 50px;">👤</span>
+                    </div>
+                </center>
+                <table class="w3-table w3-bordered w3-margin-top">
+                    <tr><th>IDNO</th><td id="display-idno"></td></tr>
+                    <tr><th>LASTNAME</th><td id="display-lastname"></td></tr>
+                    <tr><th>FIRSTNAME</th><td id="display-firstname"></td></tr>
+                    <tr><th>COURSE</th><td id="display-course"></td></tr>
+                    <tr><th>LEVEL</th><td id="display-level"></td></tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
 
-{% block scripts %}
 <script src="{{ url_for('static', filename='js/html5-qrcode.min.js') }}"></script>
 <script>
-    const html5QrCode = new Html5Qrcode("qr-reader");
-    
-    html5QrCode.start(
-        { facingMode: "environment" },
-        {
-            fps: 10,
-            qrbox: { width: 250, height: 250 }
-        },
-        (decodedText, decodedResult) => {
-            // Handle the scanned QR code
-            console.log(`QR Code detected: ${decodedText}`);
-            // You can send this to the server for attendance logging
-        },
-        (errorMessage) => {
-            // Handle scan error
-        }
-    ).catch((err) => {
-        console.log(`Unable to start scanning: ${err}`);
-    });
+    function onScanSuccess(decodedText, decodedResult) {
+        // Fetch student information
+        fetch('/api/scan/' + decodedText)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('display-idno').textContent = data.student.idno;
+                    document.getElementById('display-lastname').textContent = data.student.lastname;
+                    document.getElementById('display-firstname').textContent = data.student.firstname;
+                    document.getElementById('display-course').textContent = data.student.course;
+                    document.getElementById('display-level').textContent = data.student.level;
+                    document.getElementById('student-info').style.display = 'block';
+                    
+                    // Record attendance
+                    fetch('/api/attendance', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({idno: data.student.idno})
+                    });
+                } else {
+                    alert(data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error scanning QR code');
+            });
+    }
+
+    function onScanFailure(error) {
+        // Handle scan failure silently
+    }
+
+    let html5QrcodeScanner = new Html5QrcodeScanner(
+        "reader", 
+        { fps: 10, qrbox: {width: 250, height: 250} },
+        false
+    );
+    html5QrcodeScanner.render(onScanSuccess, onScanFailure);
 </script>
 {% endblock %}

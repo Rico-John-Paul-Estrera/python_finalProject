@@ -20,6 +20,7 @@ def init_db():
         cursor.execute('''
             CREATE TABLE users (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
                 email TEXT UNIQUE NOT NULL,
                 password TEXT NOT NULL,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -52,8 +53,8 @@ def init_db():
         
         # Insert default admin user
         admin_password = generate_password_hash('admin123')
-        cursor.execute('INSERT INTO users (email, password) VALUES (?, ?)', 
-                      ('admin@example.com', admin_password))
+        cursor.execute('INSERT INTO users (name, email, password) VALUES (?, ?, ?)', 
+                      ('Admin', 'admin@example.com', admin_password))
         
         db.commit()
         db.close()
@@ -76,17 +77,17 @@ def get_user_by_id(user_id):
 def get_all_users():
     """Get all users"""
     db = get_db()
-    users = db.execute('SELECT id, email, created_at FROM users ORDER BY created_at DESC').fetchall()
+    users = db.execute('SELECT id, name, email, created_at FROM users ORDER BY id ASC').fetchall()
     db.close()
     return users
 
-def create_user(email, password):
+def create_user(email, password, name=''):
     """Create new user"""
     db = get_db()
     try:
         hashed_password = generate_password_hash(password)
-        db.execute('INSERT INTO users (email, password) VALUES (?, ?)',
-                  (email, hashed_password))
+        db.execute('INSERT INTO users (name, email, password) VALUES (?, ?, ?)',
+                  (name, email, hashed_password))
         db.commit()
         db.close()
         return True
@@ -94,13 +95,13 @@ def create_user(email, password):
         db.close()
         return False
 
-def update_user(user_id, email, password):
+def update_user(user_id, email, password, name=''):
     """Update user"""
     db = get_db()
     try:
         hashed_password = generate_password_hash(password)
-        db.execute('UPDATE users SET email = ?, password = ? WHERE id = ?',
-                  (email, hashed_password, user_id))
+        db.execute('UPDATE users SET name=?, email=?, password=? WHERE id=?',
+                  (name, email, hashed_password, user_id))
         db.commit()
         db.close()
         return True
@@ -208,3 +209,11 @@ def get_all_attendance():
     ''').fetchall()
     db.close()
     return attendance
+
+def reset_user_id_sequence():
+    """Reset the user ID sequence to start from 1"""
+    conn = sqlite3.connect('qrcode.db')
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM sqlite_sequence WHERE name='users'")
+    conn.commit()
+    conn.close()

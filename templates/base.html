@@ -4,25 +4,36 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/w3.css') }}">
-    <title>Python(20420) 10:30 - 12:01 MW</title>
+    <title>QR App 1.0</title>
 </head>
 <body>
-    <div class="w3-bar w3-indigo w3-padding" style="position: sticky; top: 0;">
-        <span class="w3-bar-item"><b>Python(20420) 10:30 - 12:01 MW</b></span>
-        {% block navbar_right %}
-        {% endblock %}
-    </div>
-    <div class="w3-container">
-        {% block content %}
-        {% endblock %}
-    </div>
-    <div class="w3-container w3-padding">
-        <center>
-            <hr/>
-            Copyright &copy; Barney and Friend, 2025
-        </center>
-    </div>
-    {% block scripts %}
-    {% endblock %}
+        <div class="w3-bar w3-indigo w3-container w3-padding" style="position: sticky;top: 0">
+            <h4 class="w3-left">Python(12203) 8:00 - 10:30 AM TTH</h4>
+            {% block navbar_right %}
+            {% endblock %}
+        </div>
+        <div class="w3-container w3-padding">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div id="flash-message" class="w3-panel w3-{{ 'green' if category == 'success' else 'red' }} w3-round">
+                            <p>{{ message }}</p>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            <script>
+                setTimeout(function() {
+                    var flash = document.getElementById('flash-message');
+                    if (flash) flash.style.display = 'none';
+                }, 3000);
+            </script>
+            {% block content%}
+            {% endblock %}
+            <center>
+                <hr/>
+                Copyright &copy; Rico John Paul L. Estrera and Jeffrey Gaviola, 2025
+            </center>
+        </div>
 </body>
 </html>
