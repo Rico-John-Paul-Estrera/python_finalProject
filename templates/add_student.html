@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% include 'admin_sidebar.html' %}
+
+<!-- Main content -->
+<div style="margin-left:150px;">
+    <div class="w3-container">
+        <h5>ADD / UPDATE STUDENT</h5>
+        <div class="w3-row">
+            <div class="w3-half">
+                <div class="w3-card-4 w3-padding">
+                    <form method="POST" action="{{ url_for('save_student') }}" enctype="multipart/form-data">
+                        <center>
+                            <div style="width:80px; height:80px; border:2px solid #333; border-radius:50%; display:flex; align-items:center; justify-content:center;">
+                                <span style="font-size:40px;">&#128100;</span>
+                            </div>
+                        </center>
+                        <p>
+                            <label>IDNO</label>
+                            <input type="text" name="idno" id="idno" class="w3-input w3-border" value="{% if student %}{{ student.idno }}{% endif %}">
+                        </p>
+                        <p>
+                            <label>LASTNAME</label>
+                            <input type="text" name="lastname" id="lastname" class="w3-input w3-border" value="{% if student %}{{ student.lastname }}{% endif %}">
+                        </p>
+                        <p>
+                            <label>FIRSTNAME</label>
+                            <input type="text" name="firstname" id="firstname" class="w3-input w3-border" value="{% if student %}{{ student.firstname }}{% endif %}">
+                        </p>
+                        <p>
+                            <label>COURSE</label>
+                            <select name="course" id="course" class="w3-select w3-border">
+                                <option value="BSIT" {% if student and student.course == 'BSIT' %}selected{% endif %}>INFORMATION TECHNOLOGY</option>
+                                <option value="BSCS" {% if student and student.course == 'BSCS' %}selected{% endif %}>COMPUTER SCIENCE</option>
+                                <option value="BSCPE" {% if student and student.course == 'BSCPE' %}selected{% endif %}>COMPUTER ENGINEERING</option>
+                                <option value="BSCJ" {% if student and student.course == 'BSCJ' %}selected{% endif %}>CRIMINOLOGY</option>
+                                <option value="BSE" {% if student and student.course == 'BSE' %}selected{% endif %}>EDUCATION</option>
+                            </select>
+                        </p>
+                        <p>
+                            <label>LEVEL</label>
+                            <select name="level" id="level" class="w3-select w3-border">
+                                <option value="1" {% if student and student.level == '1' %}selected{% endif %}>FIRST YEAR</option>
+                                <option value="2" {% if student and student.level == '2' %}selected{% endif %}>SECOND YEAR</option>
+                                <option value="3" {% if student and student.level == '3' %}selected{% endif %}>THIRD YEAR</option>
+                                <option value="4" {% if student and student.level == '4' %}selected{% endif %}>FOURTH YEAR</option>
+                            </select>
+                        </p>
+                        <center>
+                            <div id="qrcode" style="width:100px; height:100px;"></div>
+                        </center>
+                        <br>
+                        <p class="w3-center">
+                            <button type="submit" class="w3-button w3-cyan">{% if student %}UPDATE{% else %}SAVE{% endif %}</button>
+                        </p>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/qrcode.min.js') }}"></script>
+<script>
+    var qrcode = new QRCode(document.getElementById("qrcode"), {
+        width: 100,
+        height: 100
+    });
+    
+    // Generate QR code when IDNO changes
+    document.getElementById('idno').addEventListener('input', function() {
+        qrcode.clear();
+        if (this.value) {
+            qrcode.makeCode(this.value);
+        }
+    });
+    
+    // Generate QR code on page load if editing
+    var studentIdno = "{{ student.idno if student else '' }}";
+    if (studentIdno) {
+        qrcode.makeCode(studentIdno);
+    }
+</script>
+{% endblock %}

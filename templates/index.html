@@ -1,92 +1,37 @@
 {% extends 'base.html' %}
-{% block content%}
+
+{% block navbar_right %}
+<a href="{{ url_for('admin_login') }}" class="w3-bar-item w3-button w3-right">LOGIN</a>
+{% endblock %}
+
+{% block content %}
 <br>
-<div class="w3-row-padding">
-    <div class="w3-half">
-        <div class="w3-container w3-padding w3-card-4">
-            <center>
-                <div id="mycamera" style="width:320;height:240;border:1px solid #c0c0c0;"/>
-            </center>
-            <p>
-                <label>IDNO</label>
-                <input type="number" id="idno" class="w3-input">
-            </p>
-            <p>
-                <label>NAME</label>
-                <input type="text" id="name" class="w3-input">
-            </p>
-            <p>
-                <label>COURSE</label>
-                <select id="course" class="w3-select">
-                    <option value="BSIT">INFORMATION TECHNOLOGY</option>
-                    <option value="BSCS">COMPUTER SCIENCE</option>
-                    <option value="BSCJ">CRIMINOLOGY</option>
-                    <option value="BSE">EDUCATION</option>
-                </select>
-            </p>
-            <p>
-                <label>LEVEL</label>
-                <select id="level" class="w3-select">
-                    <option value="1">FIRST YEAR</option>
-                    <option value="2">SECOND YEAR</option>
-                    <option value="3">THIRD YEAR</option>
-                    <option value="4">FOURTH YEAR</option>
-                </select>
-            </p>
-            <p class="w3-right">
-                <button class="w3-button w3-blue" onclick="takepicture()">SNAP</button>
-            </p>
-        </div>
-    </div>
-    <div class="w3-half">
-        <div class="w3-container w3-padding w3-card-4">
-                <center>
-                <div id="mypicture" style="width:320;height:240;border:1px solid #c0c0c0;"/>
-            </center>
-            <br>
-            <table class="w3-table-all">
-                <tr><td>IDNO</td><td><div id="myidno" /></td></tr>
-                <tr><td>NAME</td><td><div id="myname" /></td></tr>
-                <tr><td>COURSE</td><td><div id="mycourse" /></td></tr>
-                <tr><td>LEVEL</td><td><div id="mylevel" /></td></tr>
-            </table>
-            <br/>
-                <center>
-                    <div id="myqrcode"/>
-                </center>
-        </div>
-    </div>
-</div>
-<script src="{{ url_for('static', filename='js/webcam.min.js') }}"></script>
-<script src="{{ url_for('static', filename='js/qrcode.min.js') }}"></script>
+<center>
+    <div id="qr-reader" style="width:400px; height:300px; border:1px solid #c0c0c0;"></div>
+</center>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/html5-qrcode.min.js') }}"></script>
 <script>
-    Webcam.set({
-        width:320,
-        height:240,
-        image_format:'jpeg',
-        jpeg_quality:90,
+    const html5QrCode = new Html5Qrcode("qr-reader");
+    
+    html5QrCode.start(
+        { facingMode: "environment" },
+        {
+            fps: 10,
+            qrbox: { width: 250, height: 250 }
+        },
+        (decodedText, decodedResult) => {
+            // Handle the scanned QR code
+            console.log(`QR Code detected: ${decodedText}`);
+            // You can send this to the server for attendance logging
+        },
+        (errorMessage) => {
+            // Handle scan error
+        }
+    ).catch((err) => {
+        console.log(`Unable to start scanning: ${err}`);
     });
-    Webcam.attach("#mycamera")
-    //
-    function takepicture(){
-        Webcam.snap( function(data_uri) {
-            document.getElementById('mypicture').innerHTML = '<img id="imageprev" src="'+data_uri+'"/>';
-            document.getElementById('myidno').innerHTML = document.getElementById('idno').value;
-            document.getElementById('myname').innerHTML = document.getElementById('name').value;
-            document.getElementById('mycourse').innerHTML = document.getElementById('course').value;
-            document.getElementById('mylevel').innerHTML = document.getElementById('level').value;
-        } );
-
-        var myqrcode = document.getElementById('myqrcode');
-        var qr = new QRCode(myqrcode,{    
-            text:document.getElementById('idno').value,
-            width: 128,
-            height: 128,
-            colorDark: "#000000",
-            colorLight: "#ffffff",
-            correctLevel: QRCode.CorrectLevel.H
-        });
-    }
-
 </script>
 {% endblock %}

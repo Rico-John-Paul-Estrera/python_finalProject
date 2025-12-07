@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% block navbar_right %}
+<a href="{{ url_for('add_student') }}" class="w3-bar-item w3-button w3-right w3-cyan">+ADD</a>
+{% endblock %}
+
+{% block content %}
+{% include 'admin_sidebar.html' %}
+
+<!-- Main content -->
+<div style="margin-left:150px;">
+    <div class="w3-container">
+        <h5>STUDENT MANAGEMENT</h5>
+        <div class="w3-row">
+            <!-- Left Card (Student Info) -->
+            <div class="w3-third">
+                <div class="w3-card-4 w3-padding" id="student-card">
+                    <center>
+                        <div style="width:80px; height:80px; border:2px solid #333; border-radius:50%; display:flex; align-items:center; justify-content:center;">
+                            <span style="font-size:40px;">&#128100;</span>
+                        </div>
+                        <p id="display-idno">0001</p>
+                        <p id="display-name">DURANO, DENNIS</p>
+                        <p id="display-course">BSCPE-3</p>
+                        <div id="qrcode" style="width:100px; height:100px; margin:auto;"></div>
+                        <br>
+                        <button class="w3-button w3-cyan" onclick="updateStudent()">UPDATE</button>
+                    </center>
+                </div>
+            </div>
+            <!-- Right Table -->
+            <div class="w3-twothird">
+                <table class="w3-table-all w3-hoverable">
+                    <thead>
+                        <tr class="w3-light-blue">
+                            <th>IDNO</th>
+                            <th>LASTNAME</th>
+                            <th>FIRSTNAME</th>
+                            <th>COURSE</th>
+                            <th>LEVEL</th>
+                            <th>ACTION</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for student in students %}
+                        <tr>
+                            <td>{{ student.idno }}</td>
+                            <td>{{ student.lastname }}</td>
+                            <td>{{ student.firstname }}</td>
+                            <td>{{ student.course }}</td>
+                            <td>{{ student.level }}</td>
+                            <td>
+                                <button class="w3-button w3-small" onclick="viewStudent('{{ student.idno }}', '{{ student.lastname }}', '{{ student.firstname }}', '{{ student.course }}', '{{ student.level }}')">&#128065;</button>
+                                <a href="{{ url_for('delete_student', idno=student.idno) }}" class="w3-button w3-small w3-text-red" onclick="return confirm('Are you sure?')">&#10060;</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/qrcode.min.js') }}"></script>
+<script>
+    var qrcode = new QRCode(document.getElementById("qrcode"), {
+        width: 100,
+        height: 100
+    });
+    
+    function viewStudent(idno, lastname, firstname, course, level) {
+        document.getElementById('display-idno').innerText = idno;
+        document.getElementById('display-name').innerText = lastname + ', ' + firstname;
+        document.getElementById('display-course').innerText = course + '-' + level;
+        
+        // Clear and regenerate QR code
+        qrcode.clear();
+        qrcode.makeCode(idno);
+    }
+    
+    function updateStudent() {
+        var idno = document.getElementById('display-idno').innerText;
+        window.location.href = "{{ url_for('add_student') }}?idno=" + idno;
+    }
+</script>
+{% endblock %}

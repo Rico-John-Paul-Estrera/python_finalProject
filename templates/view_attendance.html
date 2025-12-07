@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% include 'admin_sidebar.html' %}
+
+<!-- Main content -->
+<div style="margin-left:150px;">
+    <div class="w3-container">
+        <div class="w3-row">
+            <div class="w3-half">
+                <h5>VIEW ATTENDANCE</h5>
+            </div>
+            <div class="w3-half w3-right-align">
+                <form method="GET" action="{{ url_for('view_attendance') }}" style="display:inline;">
+                    <label>SELECT DATE</label>
+                    <input type="date" name="date" class="w3-input w3-border" style="width:150px; display:inline-block;" value="{{ selected_date }}">
+                    <button type="submit" class="w3-button w3-cyan">GO</button>
+                </form>
+            </div>
+        </div>
+        <br>
+        <table class="w3-table-all w3-hoverable">
+            <thead>
+                <tr class="w3-light-blue">
+                    <th>#</th>
+                    <th>IDNO</th>
+                    <th>LASTNAME</th>
+                    <th>FIRSTNAME</th>
+                    <th>COURSE LEVEL</th>
+                    <th>TIME-IN</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for record in attendance %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ record.idno }}</td>
+                    <td>{{ record.lastname }}</td>
+                    <td>{{ record.firstname }}</td>
+                    <td>{{ record.course }}-{{ record.level }}</td>
+                    <td>{{ record.time_in }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
