@@ -5,6 +5,7 @@ from dbhelper import *
 
 app = Flask(__name__)
 app.secret_key = 'your-secret-key-here-change-in-production'
+app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024  # 50MB max file size
 
 def login_required(f):
     """Decorator to check if user is logged in"""
@@ -102,6 +103,12 @@ def delete_user_route(user_id):
 def student_management():
     """Student management page"""
     students = get_all_students()
+    # Sort students numerically by idno
+    try:
+        students = sorted(students, key=lambda s: int(s['idno']))
+    except (ValueError, TypeError):
+        # If idno cannot be converted to int, sort alphabetically
+        students = sorted(students, key=lambda s: s['idno'])
     return render_template('student_management.html', students=students)
 
 @app.route('/admin/students/add', methods=['GET', 'POST'])
@@ -117,30 +124,89 @@ def add_student():
         lastname = request.form.get('lastname')
         course = request.form.get('course')
         level = request.form.get('level')
+        photo_data = request.form.get('photo')
+        student_id = request.form.get('student_id') or student_id
+        
+        print(f"DEBUG: Request method: POST")
+        print(f"DEBUG: Form data - idno: {idno}, firstname: {firstname}, lastname: {lastname}")
+        print(f"DEBUG: Student ID: {student_id}")
+        print(f"DEBUG: Photo data present: {bool(photo_data)}")
+        if photo_data:
+            print(f"DEBUG: Photo data preview: {photo_data[:100]}")
         
         if not all([idno, firstname, lastname, course, level]):
-            flash('All fields are required', 'danger')
-            return redirect(url_for('add_student', id=student_id))
+            return jsonify({'success': False, 'message': 'All fields are required'})
+        
+        # Convert base64 photo to binary
+        photo_binary = None
+        if photo_data and photo_data.startswith('data:image'):
+            import base64
+            try:
+                photo_binary = base64.b64decode(photo_data.split(',')[1])
+                print(f"DEBUG: Converted photo to binary, size: {len(photo_binary)} bytes")
+            except Exception as e:
+                print(f"DEBUG: Error converting photo: {str(e)}")
+                return jsonify({'success': False, 'message': 'Error processing photo'})
+        else:
+            print(f"DEBUG: Photo data not in expected format")
         
         try:
             if student_id:
-                if update_student(student_id, idno, firstname, lastname, course, level):
-                    flash('Student updated successfully!', 'success')
+                if update_student(student_id, idno, firstname, lastname, course, level, photo_binary):
+                    print(f"DEBUG: Student {student_id} updated successfully")
+                    return jsonify({'success': True, 'id': student_id, 'message': 'Student updated successfully!'})
                 else:
-                    flash('Student ID already exists', 'danger')
+                    return jsonify({'success': False, 'message': 'Student ID already exists'})
             else:
-                if create_student(idno, firstname, lastname, course, level):
-                    flash('Student created successfully!', 'success')
+                result = create_student(idno, firstname, lastname, course, level, photo_binary)
+                print(f"DEBUG: Create student result: {result}")
+                if result:
+                    # Get the newly created student ID
+                    new_student = get_student_by_idno(idno)
+                    return jsonify({'success': True, 'id': new_student['id'], 'message': 'Student created successfully!'})
                 else:
-                    flash('Student ID already exists', 'danger')
-            return redirect(url_for('student_management'))
+                    return jsonify({'success': False, 'message': 'Student ID already exists'})
         except Exception as e:
-            flash(str(e), 'danger')
+            print(f"DEBUG: Exception during save: {str(e)}")
+            return jsonify({'success': False, 'message': str(e)})
     
     if student_id:
         student = get_student_by_id(student_id)
     
     return render_template('add_student.html', student=student)
+
+@app.route('/api/student/data', methods=['GET'])
+@login_required
+def get_student_data():
+    """Get student data including photo as base64"""
+    student_id = request.args.get('id')
+    if not student_id:
+        return jsonify({'success': False, 'message': 'Student ID required'}), 400
+    
+    student = get_student_by_id(student_id)
+    if not student:
+        return jsonify({'success': False, 'message': 'Student not found'}), 404
+    
+    photo_base64 = None
+    try:
+        if student['photo']:
+            import base64
+            photo_base64 = base64.b64encode(student['photo']).decode('utf-8')
+    except (KeyError, TypeError):
+        pass
+    
+    return jsonify({
+        'success': True,
+        'student': {
+            'id': student['id'],
+            'idno': student['idno'],
+            'firstname': student['firstname'],
+            'lastname': student['lastname'],
+            'course': student['course'],
+            'level': student['level']
+        },
+        'photo': photo_base64
+    })
 
 @app.route('/admin/students/save', methods=['POST'])
 @login_required
@@ -214,4 +280,4 @@ def internal_error(e):
 
 if __name__ == '__main__':
     init_db()
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(debug=True)

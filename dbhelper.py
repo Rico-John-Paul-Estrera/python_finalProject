@@ -36,6 +36,7 @@ def init_db():
                 lastname TEXT NOT NULL,
                 course TEXT NOT NULL,
                 level TEXT NOT NULL,
+                photo BLOB,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         ''')
@@ -138,12 +139,12 @@ def get_student_by_idno(idno):
     db.close()
     return student
 
-def create_student(idno, firstname, lastname, course, level):
+def create_student(idno, firstname, lastname, course, level, photo_data=None):
     """Create new student"""
     db = get_db()
     try:
-        db.execute('INSERT INTO students (idno, firstname, lastname, course, level) VALUES (?, ?, ?, ?, ?)',
-                  (idno, firstname, lastname, course, level))
+        db.execute('INSERT INTO students (idno, firstname, lastname, course, level, photo) VALUES (?, ?, ?, ?, ?, ?)',
+                  (idno, firstname, lastname, course, level, photo_data))
         db.commit()
         db.close()
         return True
@@ -151,12 +152,16 @@ def create_student(idno, firstname, lastname, course, level):
         db.close()
         return False
 
-def update_student(student_id, idno, firstname, lastname, course, level):
+def update_student(student_id, idno, firstname, lastname, course, level, photo_data=None):
     """Update student"""
     db = get_db()
     try:
-        db.execute('UPDATE students SET idno=?, firstname=?, lastname=?, course=?, level=? WHERE id=?',
-                  (idno, firstname, lastname, course, level, student_id))
+        if photo_data:
+            db.execute('UPDATE students SET idno=?, firstname=?, lastname=?, course=?, level=?, photo=? WHERE id=?',
+                      (idno, firstname, lastname, course, level, photo_data, student_id))
+        else:
+            db.execute('UPDATE students SET idno=?, firstname=?, lastname=?, course=?, level=? WHERE id=?',
+                      (idno, firstname, lastname, course, level, student_id))
         db.commit()
         db.close()
         return True

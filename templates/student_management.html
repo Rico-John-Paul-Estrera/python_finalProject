@@ -25,30 +25,20 @@
             </div>
             
             <div class="w3-row-padding w3-margin-top">
-                <!-- Student Card (Preview of first student) -->
+                <!-- Student Card (Display selected student) -->
                 {% if students %}
                 <div class="w3-col" style="width: 350px;">
                     <div class="w3-card-4 w3-padding w3-white">
                         <center>
-                            <div class="w3-circle" style="width: 80px; height: 80px; background-color: #ccc; display: inline-flex; align-items: center; justify-content: center;">
-                                <span style="font-size: 40px;">👤</span>
+                            <div id="student-photo" style="width:100%; max-width:200px; height:200px; background-color: #ccc; display: inline-flex; align-items: center; justify-content: center; border-radius: 8px; margin-bottom: 15px; overflow: hidden;">
+                                <img id="photo-img" src="" alt="Student Photo" style="width:100%; height:100%; object-fit:cover; display:none;">
+                                <span id="photo-placeholder" style="font-size: 60px;">👤</span>
                             </div>
-                            <h4>{{ students[0]['idno'] }}</h4>
-                            <p><strong>{{ students[0]['lastname']|upper }}, {{ students[0]['firstname']|upper }}</strong></p>
-                            <p>{{ students[0]['course'] }}-{{ students[0]['level'] }}</p>
-                            <div id="qrcode-{{ students[0]['id'] }}" style="margin: 10px auto;"></div>
-                            <script src="{{ url_for('static', filename='js/qrcode.min.js') }}"></script>
-                            <script>
-                                new QRCode(document.getElementById("qrcode-{{ students[0]['id'] }}"), {
-                                    text: "{{ students[0]['idno'] }}",
-                                    width: 128,
-                                    height: 128,
-                                    colorDark: "#000000",
-                                    colorLight: "#ffffff",
-                                    correctLevel: QRCode.CorrectLevel.H
-                                });
-                            </script>
-                            <a href="{{ url_for('add_student', id=students[0]['id']) }}" class="w3-button w3-cyan w3-margin-top w3-round">UPDATE</a>
+                            <h4 id="student-idno">{{ students[0]['idno'] }}</h4>
+                            <p id="student-name"><strong>{{ students[0]['lastname']|upper }}, {{ students[0]['firstname']|upper }}</strong></p>
+                            <p id="student-course">{{ students[0]['course'] }}-{{ students[0]['level'] }}</p>
+                            <div id="qrcode-container" style="margin: 10px auto;"></div>
+                            <a href="#" id="update-btn" onclick="editStudent(event)" class="w3-button w3-cyan w3-margin-top w3-round">UPDATE</a>
                         </center>
                     </div>
                 </div>
@@ -56,7 +46,7 @@
                 
                 <!-- Student List Table -->
                 <div class="w3-rest" style="margin-left: 20px;">
-                    <table class="w3-table-all w3-hoverable">
+                        <table class="w3-table-all w3-hoverable">
                         <thead>
                             <tr class="w3-indigo">
                                 <th>IDNO</th>
@@ -69,14 +59,14 @@
                         </thead>
                         <tbody>
                             {% for student in students %}
-                            <tr>
+                            <tr class="student-row" data-student-id="{{ student['id'] }}" data-idno="{{ student['idno'] }}" data-lastname="{{ student['lastname'] }}" data-firstname="{{ student['firstname'] }}" data-course="{{ student['course'] }}" data-level="{{ student['level'] }}" style="cursor: pointer;">
                                 <td>{{ student['idno'] }}</td>
                                 <td>{{ student['lastname'] }}</td>
                                 <td>{{ student['firstname'] }}</td>
                                 <td>{{ student['course'] }}</td>
                                 <td>{{ student['level'] }}</td>
-                                <td>
-                                    <a href="{{ url_for('add_student', id=student['id']) }}" class="w3-button w3-small w3-white w3-border">
+                                <td onclick="event.stopPropagation();">
+                                    <a href="{{ url_for('add_student', id=student['id']) }}" class="w3-button w3-small w3-white w3-border view-btn">
                                         👁️
                                     </a>
                                     <form method="POST" action="{{ url_for('delete_student_route', student_id=student['id']) }}" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this student?');">
@@ -94,4 +84,91 @@
         </div>
     </div>
 </div>
+
+<script src="{{ url_for('static', filename='js/qrcode.min.js') }}"></script>
+{% if students %}
+{% set first_student = students|sort(attribute='idno')|first %}
+<script>
+    // Store initial student data
+    var initialStudentData = {
+        id: "{{ first_student['id'] }}",
+        idno: "{{ first_student['idno'] }}",
+        lastname: "{{ first_student['lastname'] }}",
+        firstname: "{{ first_student['firstname'] }}",
+        course: "{{ first_student['course'] }}",
+        level: "{{ first_student['level'] }}"
+    };
+
+    // Initialize with first student
+    window.addEventListener('DOMContentLoaded', function() {
+        updateStudentCard(initialStudentData.id, initialStudentData.idno, initialStudentData.lastname, initialStudentData.firstname, initialStudentData.course, initialStudentData.level);
+    });
+</script>
+{% endif %}
+
+<script>
+    // Show details when the eye (view) button is clicked. Rows are NOT clickable anymore.
+    document.addEventListener('DOMContentLoaded', function() {
+        // Attach to all view buttons inside the table
+        document.querySelectorAll('.view-btn').forEach(function(btn) {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                // Find the row containing this button
+                var row = this.closest('tr');
+                if (!row) return;
+                var studentId = row.dataset.studentId;
+                var idno = row.dataset.idno;
+                var lastname = row.dataset.lastname;
+                var firstname = row.dataset.firstname;
+                var course = row.dataset.course;
+                var level = row.dataset.level;
+                updateStudentCard(studentId, idno, lastname, firstname, course, level);
+            });
+        });
+    });
+
+    function updateStudentCard(studentId, idno, lastname, firstname, course, level) {
+        document.getElementById('student-idno').textContent = idno;
+        document.getElementById('student-name').innerHTML = '<strong>' + lastname.toUpperCase() + ', ' + firstname.toUpperCase() + '</strong>';
+        document.getElementById('student-course').textContent = course + '-' + level;
+        document.getElementById('update-btn').href = '{{ url_for("add_student", id="") }}' + studentId;
+        
+        // Fetch student data with photo
+        fetch('{{ url_for("get_student_data") }}?id=' + studentId)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.photo) {
+                    document.getElementById('photo-img').src = 'data:image/jpeg;base64,' + data.photo;
+                    document.getElementById('photo-img').style.display = 'block';
+                    document.getElementById('photo-placeholder').style.display = 'none';
+                } else {
+                    document.getElementById('photo-img').style.display = 'none';
+                    document.getElementById('photo-placeholder').style.display = 'inline-flex';
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching student data:', error);
+                document.getElementById('photo-img').style.display = 'none';
+                document.getElementById('photo-placeholder').style.display = 'inline-flex';
+            });
+        
+        // Generate QR code
+        var qrcodeContainer = document.getElementById('qrcode-container');
+        qrcodeContainer.innerHTML = '';
+        new QRCode(qrcodeContainer, {
+            text: idno,
+            width: 128,
+            height: 128,
+            colorDark: "#000000",
+            colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.H
+        });
+    }
+
+    function editStudent(event) {
+        event.preventDefault();
+        window.location.href = document.getElementById('update-btn').href;
+    }
+</script>
 {% endblock %}

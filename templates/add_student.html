@@ -7,12 +7,12 @@
 {% block content %}
 <div class="w3-row">
     <!-- Sidebar -->
-    <div class="w3-col m2" style="background-color: #00bcd4; min-height: 100vh; padding: 0;">
-        <div class="w3-bar-block" style="padding: 10px 0;">
-            <a href="{{ url_for('user_management') }}" class="w3-bar-item w3-button w3-text-white" style="text-align: left; padding: 15px;">USER MNGT</a>
-            <a href="{{ url_for('student_management') }}" class="w3-bar-item w3-button w3-text-white" style="text-align: left; padding: 15px;">STUDENT MNGT</a>
-            <a href="{{ url_for('view_attendance') }}" class="w3-bar-item w3-button w3-text-white" style="text-align: left; padding: 15px;">VIEW ATTENDANCE</a>
-            <a href="{{ url_for('logout') }}" class="w3-bar-item w3-button w3-text-white" style="text-align: left; padding: 15px;">LOGOUT</a>
+   <div class="w3-col" style="width: 230px; background-color: #00bcd4; min-height: 100vh;">
+        <div class="w3-container w3-padding">
+            <a href="{{ url_for('user_management') }}" class="w3-button w3-block w3-white w3-margin-top w3-round" style="white-space: nowrap; padding-left: 8px; padding-right: 8px;">USER MANAGEMENT</a>
+            <a href="{{ url_for('student_management') }}" class="w3-button w3-block w3-white w3-margin-top w3-round" style="white-space: nowrap; padding-left: 8px; padding-right: 8px;">STUDENT MANAGEMENT</a>
+            <a href="{{ url_for('view_attendance') }}" class="w3-button w3-block w3-white w3-margin-top w3-round" style="white-space: normal; padding-left: 8px; padding-right: 8px;">VIEW ATTENDANCE</a>
+            <a href="{{ url_for('logout') }}" class="w3-button w3-block w3-white w3-margin-top w3-round" style="white-space: normal; padding-left: 8px; padding-right: 8px;">LOGOUT</a>
         </div>
     </div>
 
@@ -21,7 +21,7 @@
         <h3>ADD/UPDATE STUDENT</h3>
         
         <div class="w3-row-padding">
-            <!-- Left Panel - Camera -->
+            <!-- Left Panel - Camera and Form -->
             <div class="w3-half">
                 <div class="w3-container w3-padding w3-card-4 w3-border">
                     <label class="w3-text-red"><b>CAMERA VIEWER</b></label>
@@ -67,26 +67,36 @@
                 </div>
             </div>
 
-            <!-- Right Panel - Preview -->
+            <!-- Right Panel - Preview and QR Code -->
             <div class="w3-half">
                 <div class="w3-container w3-padding w3-card-4 w3-border">
-                    <center>
-                        <div id="mypicture" style="width:100%; max-width:320px; height:240px; border:1px solid #c0c0c0; margin: 20px 0; background-color: #f0f0f0;"></div>
-                    </center>
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 20px;">
+                        <!-- Picture and QR Code Row -->
+                        <div style="display: flex; justify-content: space-around; width: 100%; gap: 20px; align-items: flex-start;">
+                            <!-- Picture on Left -->
+                            <div style="flex: 1; text-align: center;">
+                                <div id="mypicture" style="width:100%; max-width:280px; border:1px solid #c0c0c0; background-color: #f0f0f0; padding:0; box-sizing: border-box; display: flex; align-items: center; justify-content: center;"></div>
+                            </div>
 
-                    <table class="w3-table w3-bordered w3-margin-top">
-                        <tr><th>IDNO</th><td id="myidno">-</td></tr>
-                        <tr><th>LASTNAME</th><td id="mylastname">-</td></tr>
-                        <tr><th>FIRSTNAME</th><td id="myfirstname">-</td></tr>
-                        <tr><th>COURSE</th><td id="mycourse">-</td></tr>
-                        <tr><th>LEVEL</th><td id="mylevel">-</td></tr>
-                    </table>
+                            <!-- QR Code on Right -->
+                            <div style="flex: 1; text-align: center;">
+                                <div id="myqrcode" style="display: flex; justify-content: center; align-items: center;"></div>
+                            </div>
+                        </div>
+
+                        <!-- Info Table Below (Centered) -->
+                        <div style="width: 100%; max-width: 400px;">
+                            <table class="w3-table w3-bordered" style="width: 100%;">
+                                <tr><td style="padding: 10px; font-weight: bold; width: 50%; text-align: center;">IDNO</td><td style="padding: 10px; text-align: center;" id="myidno">-</td></tr>
+                                <tr><td style="padding: 10px; font-weight: bold; width: 50%; text-align: center;">LASTNAME</td><td style="padding: 10px; text-align: center;" id="mylastname">-</td></tr>
+                                <tr><td style="padding: 10px; font-weight: bold; width: 50%; text-align: center;">FIRSTNAME</td><td style="padding: 10px; text-align: center;" id="myfirstname">-</td></tr>
+                                <tr><td style="padding: 10px; font-weight: bold; width: 50%; text-align: center;">COURSE</td><td style="padding: 10px; text-align: center;" id="mycourse">-</td></tr>
+                                <tr><td style="padding: 10px; font-weight: bold; width: 50%; text-align: center;">LEVEL</td><td style="padding: 10px; text-align: center;" id="mylevel">-</td></tr>
+                            </table>
+                        </div>
+                    </div>
 
                     <br>
-                    <center>
-                        <div id="myqrcode" style="margin: 20px 0;"></div>
-                    </center>
-
                     <center>
                         <button class="w3-button w3-cyan w3-round w3-margin-top" onclick="saveStudent()">SAVE</button>
                     </center>
@@ -99,66 +109,161 @@
 <script src="{{ url_for('static', filename='js/webcam.min.js') }}"></script>
 <script src="{{ url_for('static', filename='js/qrcode.min.js') }}"></script>
 <script>
-    Webcam.set({
-        width: 320,
-        height: 240,
-        image_format: 'jpeg',
-        jpeg_quality: 90,
+    let capturedPhotoData = null;
+    let studentId = null;
+    
+    // Initialize camera when page loads
+    window.addEventListener('load', function() {
+        Webcam.set({
+            width: 320,
+            height: 240,
+            image_format: 'jpeg',
+            jpeg_quality: 90
+        });
+        Webcam.attach('#mycamera');
+        
+        // Check if editing an existing student
+        const urlParams = new URLSearchParams(window.location.search);
+        studentId = urlParams.get('id');
+        if (studentId) {
+            loadStudentData(studentId);
+        }
     });
-    Webcam.attach("#mycamera");
+
+    function loadStudentData(id) {
+        // Fetch student data from API
+        fetch('/api/student/data?id=' + id)
+            .then(response => response.json())
+            .then(data => {
+                if (data && data.student) {
+                    const student = data.student;
+                    
+                    // Populate form fields
+                    document.getElementById('idno').value = student.idno || '';
+                    document.getElementById('lastname').value = student.lastname || '';
+                    document.getElementById('firstname').value = student.firstname || '';
+                    document.getElementById('course').value = student.course || '';
+                    document.getElementById('level').value = student.level || '';
+                    
+                    // Update info table on right side
+                    document.getElementById('myidno').textContent = student.idno || '-';
+                    document.getElementById('mylastname').textContent = student.lastname || '-';
+                    document.getElementById('myfirstname').textContent = student.firstname || '-';
+                    document.getElementById('mycourse').textContent = student.course || '-';
+                    document.getElementById('mylevel').textContent = student.level || '-';
+                    
+                    // Display existing photo if available
+                    if (data.photo) {
+                        const photoContainer = document.getElementById('mypicture');
+                        const img = document.createElement('img');
+                        img.src = 'data:image/jpeg;base64,' + data.photo;
+                        img.style.width = '100%';
+                        img.style.height = 'auto';
+                        img.style.objectFit = 'scale-down';
+                        img.style.display = 'block';
+                        img.style.maxWidth = '100%';
+                        photoContainer.innerHTML = '';
+                        photoContainer.appendChild(img);
+                    }
+                    
+                    // Generate QR code from student IDNO
+                    generateQRCode(student.idno);
+                }
+            })
+            .catch(error => {
+                console.error('Error loading student data:', error);
+            });
+    }
+
+    function generateQRCode(text) {
+        document.getElementById('myqrcode').innerHTML = '';
+        const qr = new QRCode(document.getElementById('myqrcode'), {
+            text: text,
+            width: 200,
+            height: 200
+        });
+    }
 
     function takepicture() {
         Webcam.snap(function(data_uri) {
-            document.getElementById('mypicture').innerHTML = '<img id="imageprev" src="' + data_uri + '" style="width:100%; height:100%; object-fit:cover;"/>';
-            document.getElementById('myidno').innerHTML = document.getElementById('idno').value || '-';
-            document.getElementById('mylastname').innerHTML = document.getElementById('lastname').value || '-';
-            document.getElementById('myfirstname').innerHTML = document.getElementById('firstname').value || '-';
-            document.getElementById('mycourse').innerHTML = document.getElementById('course').value || '-';
-            document.getElementById('mylevel').innerHTML = document.getElementById('level').value || '-';
-
-            // Generate QR Code
-            var myqrcode = document.getElementById('myqrcode');
-            myqrcode.innerHTML = ''; // Clear previous QR code
-            var qr = new QRCode(myqrcode, {
-                text: document.getElementById('idno').value,
-                width: 128,
-                height: 128,
-                colorDark: "#000000",
-                colorLight: "#ffffff",
-                correctLevel: QRCode.CorrectLevel.H
-            });
+            // Store the captured photo
+            capturedPhotoData = data_uri;
+            
+            // Display it in the preview area (no cropping)
+            const photoContainer = document.getElementById('mypicture');
+            const img = document.createElement('img');
+            img.src = data_uri;
+            img.style.width = '100%';
+            img.style.height = 'auto';
+            img.style.objectFit = 'scale-down';
+            img.style.display = 'block';
+            img.style.maxWidth = '100%';
+            photoContainer.innerHTML = '';
+            photoContainer.appendChild(img);
+            
+            // Update the info table display
+            document.getElementById('myidno').textContent = document.getElementById('idno').value || '-';
+            document.getElementById('mylastname').textContent = document.getElementById('lastname').value || '-';
+            document.getElementById('myfirstname').textContent = document.getElementById('firstname').value || '-';
+            document.getElementById('mycourse').textContent = document.getElementById('course').value || '-';
+            document.getElementById('mylevel').textContent = document.getElementById('level').value || '-';
+            
+            // Generate QR Code from IDNO
+            generateQRCode(document.getElementById('idno').value);
         });
     }
 
     function saveStudent() {
-        var idno = document.getElementById('idno').value;
-        var lastname = document.getElementById('lastname').value;
-        var firstname = document.getElementById('firstname').value;
-        var course = document.getElementById('course').value;
-        var level = document.getElementById('level').value;
+        // Get form values
+        const idno = document.getElementById('idno').value;
+        const lastname = document.getElementById('lastname').value;
+        const firstname = document.getElementById('firstname').value;
+        const course = document.getElementById('course').value;
+        const level = document.getElementById('level').value;
 
+        // Validate required fields
         if (!idno || !lastname || !firstname || !course || !level) {
-            alert('Please fill in all fields');
+            alert('Please fill all fields');
             return;
         }
 
-        var formData = new FormData();
+        // If adding new student, require photo. If editing, photo is optional
+        if (!studentId && !capturedPhotoData) {
+            alert('Please capture a photo');
+            return;
+        }
+
+        // Prepare form data
+        const formData = new FormData();
         formData.append('idno', idno);
         formData.append('lastname', lastname);
         formData.append('firstname', firstname);
         formData.append('course', course);
         formData.append('level', level);
+        
+        // Only include photo if one was captured
+        if (capturedPhotoData) {
+            formData.append('photo', capturedPhotoData);
+        }
 
-        fetch('{{ url_for("save_student") }}', {
+        // If editing, include the student ID
+        if (studentId) {
+            formData.append('student_id', studentId);
+        }
+
+        // Send to server
+        fetch('{{ url_for("add_student") }}', {
             method: 'POST',
             body: formData
         })
-        .then(response => {
-            if (response.ok) {
-                alert('Student saved successfully!');
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Student saved successfully! ID: ' + data.id);
+                // Redirect to student management
                 window.location.href = '{{ url_for("student_management") }}';
             } else {
-                alert('Error saving student');
+                alert('Error: ' + (data.message || 'Unknown error'));
             }
         })
         .catch(error => {
