@@ -50,7 +50,7 @@
                             <td>{{ record['firstname'] }}</td>
                             <td>{{ record['course'] }}</td>
                             <td>{{ record['level'] }}</td>
-                            <td>{{ record['time_in'] }}</td>
+                            <td>{{ record['time_in'] if record['time_in'] else '-' }}</td>
                         </tr>
                         {% endfor %}
                     {% else %}

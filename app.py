@@ -43,12 +43,11 @@ def admin_login():
     
     return render_template('admin_login.html')
 
-@app.route('/admin/logout')
+@app.route('/logout')
 def logout():
     """Logout admin"""
     session.clear()
-    flash('Logged out successfully!', 'success')
-    return redirect(url_for('admin_login'))
+    return redirect(url_for('index'))
 
 @app.route('/admin/users')
 @login_required
@@ -238,6 +237,14 @@ def scan_student(idno):
     if not student:
         return jsonify({'success': False, 'message': 'Student not found'}), 404
     
+    photo_base64 = None
+    try:
+        if student['photo']:
+            import base64
+            photo_base64 = base64.b64encode(student['photo']).decode('utf-8')
+    except (KeyError, TypeError):
+        pass
+    
     return jsonify({
         'success': True,
         'student': {
@@ -246,7 +253,8 @@ def scan_student(idno):
             'lastname': student['lastname'],
             'course': student['course'],
             'level': student['level']
-        }
+        },
+        'photo': photo_base64
     })
 
 @app.route('/api/attendance', methods=['POST'])
@@ -263,11 +271,15 @@ def record_attendance_api():
     if not student:
         return jsonify({'success': False, 'message': 'Student not found'}), 404
     
-    if record_attendance(student['id']):
-        return jsonify({'success': True, 'message': f'Attendance recorded for {idno}'})
+    result = record_attendance(student['id'])
+    
+    if result['recorded']:
+        return jsonify({'success': True, 'message': 'MARKED AS PRESENT!', 'already_present': False})
+    elif result['already_present']:
+        return jsonify({'success': True, 'message': 'ALREADY MARKED AS PRESENT TODAY', 'already_present': True})
     else:
         return jsonify({'success': False, 'message': 'Error recording attendance'}), 500
-
+    
 @app.errorhandler(404)
 def page_not_found(e):
     """404 error handler"""

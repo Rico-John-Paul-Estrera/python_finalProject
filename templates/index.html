@@ -10,28 +10,54 @@
     <h3>QRCode Reader Viewer</h3>
     <div class="w3-card-4" style="max-width: 600px; margin: 0 auto; padding: 20px;">
         <div id="reader" style="width: 100%;"></div>
-        <div id="result" class="w3-container w3-margin-top">
-            <div id="student-info" style="display: none;">
-                <center>
-                    <div class="w3-circle" style="width: 100px; height: 100px; background-color: #ccc; display: inline-flex; align-items: center; justify-content: center; margin: 20px;">
-                        <span style="font-size: 50px;">👤</span>
-                    </div>
-                </center>
-                <table class="w3-table w3-bordered w3-margin-top">
-                    <tr><th>IDNO</th><td id="display-idno"></td></tr>
-                    <tr><th>LASTNAME</th><td id="display-lastname"></td></tr>
-                    <tr><th>FIRSTNAME</th><td id="display-firstname"></td></tr>
-                    <tr><th>COURSE</th><td id="display-course"></td></tr>
-                    <tr><th>LEVEL</th><td id="display-level"></td></tr>
-                </table>
+    </div>
+</div>
+
+<!-- Modal Panel for Student Info -->
+<div id="student-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 1000; align-items: center; justify-content: center;">
+    <div class="w3-card-4" style="max-width: 500px; width: 90%; background-color: white; padding: 30px; border-radius: 8px;">
+        <center>
+            <div id="student-photo" style="width: 200px; height: 200px; background-color: #ccc; display: inline-flex; align-items: center; justify-content: center; border-radius: 8px; margin-bottom: 20px; overflow: hidden;">
+                <img id="photo-img" src="" alt="Student Photo" style="width: 100%; height: 100%; object-fit: contain; display: none;">
+                <span id="photo-placeholder" style="font-size: 80px;">👤</span>
             </div>
-        </div>
+        </center>
+        
+        <div id="status-message" style="text-align: center; font-size: 18px; font-weight: bold; color: #00bcd4; margin-bottom: 20px; display: none;"></div>
+        
+        <table class="w3-table w3-bordered w3-margin-top" style="text-align: center;">
+            <tr><td style="padding: 10px; font-weight: bold; width: 50%; text-align: center;">IDNO</td><td style="padding: 10px; text-align: center;" id="display-idno">-</td></tr>
+            <tr><td style="padding: 10px; font-weight: bold; width: 50%; text-align: center;">LASTNAME</td><td style="padding: 10px; text-align: center;" id="display-lastname">-</td></tr>
+            <tr><td style="padding: 10px; font-weight: bold; width: 50%; text-align: center;">FIRSTNAME</td><td style="padding: 10px; text-align: center;" id="display-firstname">-</td></tr>
+            <tr><td style="padding: 10px; font-weight: bold; width: 50%; text-align: center;">COURSE</td><td style="padding: 10px; text-align: center;" id="display-course">-</td></tr>
+            <tr><td style="padding: 10px; font-weight: bold; width: 50%; text-align: center;">LEVEL</td><td style="padding: 10px; text-align: center;" id="display-level">-</td></tr>
+        </table>
+        
+        <center>
+            <button class="w3-button w3-cyan w3-round w3-margin-top" onclick="closeStudentModal()">CLOSE</button>
+        </center>
     </div>
 </div>
 
 <script src="{{ url_for('static', filename='js/html5-qrcode.min.js') }}"></script>
 <script>
+    function openStudentModal() {
+        document.getElementById('student-modal').style.display = 'flex';
+    }
+
+    function closeStudentModal() {
+        document.getElementById('student-modal').style.display = 'none';
+        // Clear status message
+        document.getElementById('status-message').style.display = 'none';
+        document.getElementById('status-message').textContent = '';
+        // Resume scanning
+        html5QrcodeScanner.resume();
+    }
+
     function onScanSuccess(decodedText, decodedResult) {
+        // Pause scanner while processing
+        html5QrcodeScanner.pause();
+        
         // Fetch student information
         fetch('/api/scan/' + decodedText)
             .then(response => response.json())
@@ -42,21 +68,49 @@
                     document.getElementById('display-firstname').textContent = data.student.firstname;
                     document.getElementById('display-course').textContent = data.student.course;
                     document.getElementById('display-level').textContent = data.student.level;
-                    document.getElementById('student-info').style.display = 'block';
+                    
+                    // Display photo if available
+                    if (data.photo) {
+                        document.getElementById('photo-img').src = 'data:image/jpeg;base64,' + data.photo;
+                        document.getElementById('photo-img').style.display = 'block';
+                        document.getElementById('photo-placeholder').style.display = 'none';
+                    } else {
+                        document.getElementById('photo-img').style.display = 'none';
+                        document.getElementById('photo-placeholder').style.display = 'inline-flex';
+                    }
+                    
+                    // Open modal
+                    openStudentModal();
                     
                     // Record attendance
                     fetch('/api/attendance', {
                         method: 'POST',
                         headers: {'Content-Type': 'application/json'},
                         body: JSON.stringify({idno: data.student.idno})
+                    })
+                    .then(response => response.json())
+                    .then(attendanceData => {
+                        // Display attendance status message
+                        const statusMsg = document.getElementById('status-message');
+                        statusMsg.textContent = attendanceData.message;
+                        statusMsg.style.display = 'block';
+                        
+                        // Color code: green for new, orange for already present
+                        if (attendanceData.already_present) {
+                            statusMsg.style.color = '#ff9800';
+                        } else {
+                            statusMsg.style.color = '#4caf50';
+                        }
                     });
                 } else {
                     alert(data.message);
+                    html5QrcodeScanner.resume();
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
                 alert('Error scanning QR code');
+                html5QrcodeScanner.resume();
             });
     }
 

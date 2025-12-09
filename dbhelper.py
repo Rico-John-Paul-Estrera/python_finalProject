@@ -1,6 +1,7 @@
 import sqlite3
 import os
 from werkzeug.security import generate_password_hash
+from datetime import datetime, timedelta
 
 DATABASE = 'createqr.db'
 
@@ -179,29 +180,58 @@ def delete_student(student_id):
 
 # Attendance functions
 def record_attendance(student_id):
-    """Record attendance for student"""
+    """Record attendance for student if not already recorded today"""
+    from datetime import datetime
     db = get_db()
     try:
+        # Check if student already has attendance for today
+        today = datetime.now().strftime('%Y-%m-%d')
+        existing = db.execute('''
+            SELECT id FROM attendance 
+            WHERE student_id = ? AND DATE(date) = ?
+        ''', (student_id, today)).fetchone()
+        
+        if existing:
+            db.close()
+            return {'recorded': False, 'already_present': True}
+        
+        # Record new attendance
         db.execute('INSERT INTO attendance (student_id) VALUES (?)', (student_id,))
         db.commit()
         db.close()
-        return True
+        return {'recorded': True, 'already_present': False}
     except Exception as e:
         db.close()
-        return False
+        return {'recorded': False, 'already_present': False}
 
-def get_attendance_by_date(date):
-    """Get attendance records by date"""
-    db = get_db()
-    attendance = db.execute('''
-        SELECT s.id, s.idno, s.firstname, s.lastname, s.course, s.level, a.time_in
+def get_attendance_by_date(date_str):
+    conn = get_db()
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+    
+    cursor.execute("""
+        SELECT a.id, s.idno, s.firstname, s.lastname, s.course, s.level, a.time_in
         FROM attendance a
         JOIN students s ON a.student_id = s.id
-        WHERE DATE(a.date) = ?
-        ORDER BY a.time_in DESC
-    ''', (date,)).fetchall()
-    db.close()
-    return attendance
+        WHERE DATE(a.time_in) = ?
+        ORDER BY a.time_in ASC
+    """, (date_str,))
+    
+    attendance = cursor.fetchall()
+    conn.close()
+    
+    # Format the time_in to Philippine time (UTC+8)
+    formatted_attendance = []
+    for record in attendance:
+        time_in = datetime.strptime(record['time_in'], '%Y-%m-%d %H:%M:%S')
+        ph_time = time_in + timedelta(hours=8)
+        formatted_time = ph_time.strftime('%I:%M %p')
+        
+        formatted_record = dict(record)
+        formatted_record['time_in'] = formatted_time
+        formatted_attendance.append(formatted_record)
+    
+    return formatted_attendance
 
 def get_all_attendance():
     """Get all attendance records"""
@@ -222,3 +252,70 @@ def reset_user_id_sequence():
     cursor.execute("DELETE FROM sqlite_sequence WHERE name='users'")
     conn.commit()
     conn.close()
+
+# Database utility functions for migration and debugging
+
+def migrate_add_photo_column():
+    """Add photo column to students table if it doesn't exist"""
+    db = get_db()
+    cursor = db.cursor()
+    
+    try:
+        cursor.execute("PRAGMA table_info(students)")
+        columns = [column[1] for column in cursor.fetchall()]
+        
+        if 'photo' not in columns:
+            print("Adding photo column to students table...")
+            cursor.execute("ALTER TABLE students ADD COLUMN photo BLOB")
+            db.commit()
+            print("Photo column added successfully!")
+        else:
+            print("Photo column already exists.")
+        
+        # Verify the column
+        cursor.execute("PRAGMA table_info(students)")
+        print("\nCurrent table schema:")
+        for col in cursor.fetchall():
+            print(f"  {col[1]} ({col[2]})")
+    finally:
+        db.close()
+
+def check_all_photos():
+    """Check and display all students and their photo status"""
+    db = get_db()
+    cursor = db.cursor()
+    
+    try:
+        cursor.execute("SELECT id, idno, firstname, lastname, photo FROM students ORDER BY id")
+        students = cursor.fetchall()
+        
+        print("\n=== All Students in Database ===")
+        if not students:
+            print("No students found.")
+        else:
+            for student in students:
+                student_id, idno, firstname, lastname, photo = student
+                photo_status = f"Has photo ({len(photo)} bytes)" if photo else "No photo"
+                print(f"  ID: {student_id}, IDNO: {idno}, Name: {firstname} {lastname}, Photo: {photo_status}")
+    finally:
+        db.close()
+
+def check_photos_simple():
+    """Simple check: display all students and their photo status"""
+    db = get_db()
+    cursor = db.cursor()
+    
+    try:
+        cursor.execute("SELECT idno, firstname, lastname, photo FROM students")
+        students = cursor.fetchall()
+        
+        print("\n=== Students in Database ===")
+        if not students:
+            print("No students found.")
+        else:
+            for student in students:
+                idno, firstname, lastname, photo = student
+                photo_status = "Has photo" if photo else "No photo"
+                print(f"  IDNO: {idno}, Name: {firstname} {lastname}, Photo: {photo_status}")
+    finally:
+        db.close()
