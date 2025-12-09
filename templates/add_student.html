@@ -183,6 +183,35 @@
             height: 200
         });
     }
+    
+    function saveQRCodeImage(idno) {
+        // Get the QR code canvas and convert to image
+        const qrCanvas = document.querySelector('#myqrcode canvas');
+        if (qrCanvas) {
+            const qrImageData = qrCanvas.toDataURL('image/png');
+            
+            // Send QR code to server
+            fetch('/api/save-qrcode', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    qrcode_data: qrImageData,
+                    idno: idno
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    console.log('QR code saved:', data.filename);
+                } else {
+                    console.error('Error saving QR code:', data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+    }
 
     function takepicture() {
         Webcam.snap(function(data_uri) {
@@ -259,6 +288,26 @@
         .then(response => response.json())
         .then(data => {
             if (data.success) {
+                // Now save the photo to static/images folder (only after successful student save)
+                if (capturedPhotoData) {
+                    fetch('/api/save-photo', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({
+                            photo_data: capturedPhotoData,
+                            firstname: firstname,
+                            lastname: lastname
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(photoData => {
+                        console.log('Photo saved:', photoData.filename);
+                    })
+                    .catch(error => {
+                        console.error('Error saving photo:', error);
+                    });
+                }
+                
                 alert('Student saved successfully! ID: ' + data.id);
                 // Redirect to student management
                 window.location.href = '{{ url_for("student_management") }}';

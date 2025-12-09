@@ -3,7 +3,7 @@
 {% block content%}
 <div class="w3-row">
     <!-- Sidebar -->
-    <div class="w3-col" style="width: 230px; background-color: #00bcd4; min-height: 100vh;">
+    <div class="w3-col" style="width: 230px; background-color: #a0aecd; min-height: 100vh;">
         <div class="w3-container w3-padding">
             <a href="{{ url_for('user_management') }}" class="w3-button w3-block w3-white w3-margin-top w3-round" style="white-space: nowrap; padding-left: 8px; padding-right: 8px;">USER MANAGEMENT</a>
             <a href="{{ url_for('student_management') }}" class="w3-button w3-block w3-white w3-margin-top w3-round" style="white-space: nowrap; padding-left: 8px; padding-right: 8px;">STUDENT MANAGEMENT</a>
@@ -49,21 +49,21 @@
                     <table class="w3-table-all w3-hoverable">
                         <thead>
                             <tr class="w3-indigo">
-                                <th>ID</th>
+                                <th style="text-align: center;">ID</th>
                                 <th>NAME</th>
                                 <th>EMAIL</th>
-                                <th>PASSWORD</th>
-                                <th>ACTION</th>
+                                <th style="text-align: center;">PASSWORD</th>
+                                <th style="text-align: center;">ACTION</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for user in users %}
                             <tr>
-                                <td>{{ user['id'] }}</td>
+                                <td style="text-align: center;">{{ user['id'] }}</td>
                                 <td>{{ user['name'] }}</td>
                                 <td>{{ user['email'] }}</td>
-                                <td>********</td>
-                                <td>
+                                <td style="text-align: center;">********</td>
+                                <td style="text-align: center;">
                                     <button class="w3-button w3-small w3-white w3-border edit-user-btn" data-id="{{ user['id'] }}" data-email="{{ user['email'] }}" data-name="{{ user['name'] }}">
                                         ✏️
                                     </button>

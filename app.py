@@ -2,6 +2,8 @@ from flask import Flask, render_template, request, redirect, url_for, session, f
 from werkzeug.security import check_password_hash
 from datetime import datetime
 from dbhelper import *
+import base64
+import os
 
 app = Flask(__name__)
 app.secret_key = 'your-secret-key-here-change-in-production'
@@ -257,6 +259,58 @@ def scan_student(idno):
         'photo': photo_base64
     })
 
+@app.route('/api/save-photo', methods=['POST'])
+@login_required
+def save_photo():
+    """Save captured photo to static/images folder"""
+    try:
+        data = request.get_json()
+        photo_data = data['photo_data']
+        firstname = data['firstname']
+        lastname = data['lastname']
+        
+        base64_data = photo_data.split(',')[1]
+        photo_binary = base64.b64decode(base64_data)
+        
+        # Generate filename based on firstname and lastname
+        filename = f"{firstname}_{lastname}.jpg"
+        
+        # Save to static/images folder
+        filepath = os.path.join(app.root_path, 'static', 'images', filename)
+        with open(filepath, 'wb') as f:
+            f.write(photo_binary)
+        
+        return jsonify({'success': True, 'filename': filename})
+        
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+
+@app.route('/api/save-qrcode', methods=['POST'])
+@login_required
+def save_qrcode():
+    """Save generated QR code to static/qrcode folder"""
+    try:
+        data = request.get_json()
+        qrcode_data = data['qrcode_data']
+        idno = data['idno']
+        
+        # Extract base64 data and decode
+        base64_data = qrcode_data.split(',')[1]
+        qrcode_binary = base64.b64decode(base64_data)
+        
+        # Generate filename based on IDNO
+        filename = f"qrcode_{idno}.png"
+        
+        # Save to static/qrcode folder
+        filepath = os.path.join(app.root_path, 'static', 'qrcode', filename)
+        with open(filepath, 'wb') as f:
+            f.write(qrcode_binary)
+        
+        return jsonify({'success': True, 'filename': filename})
+        
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+
 @app.route('/api/attendance', methods=['POST'])
 def record_attendance_api():
     """Record attendance via QR code scan"""
@@ -279,16 +333,6 @@ def record_attendance_api():
         return jsonify({'success': True, 'message': 'ALREADY MARKED AS PRESENT TODAY', 'already_present': True})
     else:
         return jsonify({'success': False, 'message': 'Error recording attendance'}), 500
-    
-@app.errorhandler(404)
-def page_not_found(e):
-    """404 error handler"""
-    return render_template('404.html'), 404
-
-@app.errorhandler(500)
-def internal_error(e):
-    """500 error handler"""
-    return render_template('500.html'), 500
 
 if __name__ == '__main__':
     init_db()
