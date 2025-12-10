@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
 from werkzeug.security import check_password_hash
 from datetime import datetime
-from dbhelper import *
+from db.dbhelper import *
 import base64
 import os
 
@@ -335,5 +335,4 @@ def record_attendance_api():
         return jsonify({'success': False, 'message': 'Error recording attendance'}), 500
 
 if __name__ == '__main__':
-    init_db()
     app.run(debug=True)

@@ -3,63 +3,13 @@ import os
 from werkzeug.security import generate_password_hash
 from datetime import datetime, timedelta
 
-DATABASE = 'createqr.db'
+DATABASE = os.path.join(os.path.dirname(__file__), 'school.db')
 
 def get_db():
     """Get database connection"""
     db = sqlite3.connect(DATABASE)
     db.row_factory = sqlite3.Row
     return db
-
-def init_db():
-    """Initialize database with tables"""
-    if not os.path.exists(DATABASE):
-        db = get_db()
-        cursor = db.cursor()
-        
-        # Create users table
-        cursor.execute('''
-            CREATE TABLE users (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT NOT NULL,
-                email TEXT UNIQUE NOT NULL,
-                password TEXT NOT NULL,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            )
-        ''')
-        
-        # Create students table
-        cursor.execute('''
-            CREATE TABLE students (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                idno TEXT UNIQUE NOT NULL,
-                firstname TEXT NOT NULL,
-                lastname TEXT NOT NULL,
-                course TEXT NOT NULL,
-                level TEXT NOT NULL,
-                photo BLOB,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            )
-        ''')
-        
-        # Create attendance table
-        cursor.execute('''
-            CREATE TABLE attendance (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                student_id INTEGER NOT NULL,
-                time_in TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                date DATE DEFAULT CURRENT_DATE,
-                FOREIGN KEY (student_id) REFERENCES students(id)
-            )
-        ''')
-        
-        # Insert default admin user
-        admin_password = generate_password_hash('admin123')
-        cursor.execute('INSERT INTO users (name, email, password) VALUES (?, ?, ?)', 
-                      ('Admin', 'admin@example.com', admin_password))
-        
-        db.commit()
-        db.close()
 
 # User functions
 def get_user_by_email(email):
@@ -181,11 +131,14 @@ def delete_student(student_id):
 # Attendance functions
 def record_attendance(student_id):
     """Record attendance for student if not already recorded today"""
-    from datetime import datetime
+    from datetime import datetime, timedelta
     db = get_db()
     try:
+        # Get current date in Philippine timezone (UTC+8)
+        ph_tz_offset = timedelta(hours=8)
+        today = (datetime.utcnow() + ph_tz_offset).strftime('%Y-%m-%d')
+        
         # Check if student already has attendance for today
-        today = datetime.now().strftime('%Y-%m-%d')
         existing = db.execute('''
             SELECT id FROM attendance 
             WHERE student_id = ? AND DATE(date) = ?
@@ -195,12 +148,16 @@ def record_attendance(student_id):
             db.close()
             return {'recorded': False, 'already_present': True}
         
-        # Record new attendance
-        db.execute('INSERT INTO attendance (student_id) VALUES (?)', (student_id,))
+        # Record new attendance with Philippine timezone timestamp
+        now_ph = datetime.utcnow() + ph_tz_offset
+        time_in_str = now_ph.strftime('%Y-%m-%d %H:%M:%S')
+        db.execute('INSERT INTO attendance (student_id, time_in, date) VALUES (?, ?, ?)', 
+                   (student_id, time_in_str, today))
         db.commit()
         db.close()
         return {'recorded': True, 'already_present': False}
     except Exception as e:
+        print(f"Error recording attendance: {str(e)}")
         db.close()
         return {'recorded': False, 'already_present': False}
 
@@ -220,16 +177,18 @@ def get_attendance_by_date(date_str):
     attendance = cursor.fetchall()
     conn.close()
     
-    # Format the time_in to Philippine time (UTC+8)
+    # Format the time_in - it's already in Philippine time from record_attendance()
     formatted_attendance = []
     for record in attendance:
-        time_in = datetime.strptime(record['time_in'], '%Y-%m-%d %H:%M:%S')
-        ph_time = time_in + timedelta(hours=8)
-        formatted_time = ph_time.strftime('%I:%M %p')
-        
-        formatted_record = dict(record)
-        formatted_record['time_in'] = formatted_time
-        formatted_attendance.append(formatted_record)
+        try:
+            time_in = datetime.strptime(record['time_in'], '%Y-%m-%d %H:%M:%S')
+            formatted_time = time_in.strftime('%I:%M %p')
+            
+            formatted_record = dict(record)
+            formatted_record['time_in'] = formatted_time
+            formatted_attendance.append(formatted_record)
+        except (ValueError, TypeError):
+            formatted_attendance.append(record)
     
     return formatted_attendance
 

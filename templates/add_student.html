@@ -279,6 +279,9 @@
         .then(response => response.json())
         .then(data => {
             if (data.success) {
+                // Save the QR code
+                saveQRCodeImage(idno);
+                
                 // Now save the photo to static/images folder (only after successful student save)
                 if (capturedPhotoData) {
                     fetch('/api/save-photo', {

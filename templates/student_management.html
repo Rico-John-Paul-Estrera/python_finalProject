@@ -87,7 +87,7 @@
 
 <script src="{{ url_for('static', filename='js/qrcode.min.js') }}"></script>
 {% if students %}
-{% set first_student = students|sort(attribute='idno')|first %}
+{% set first_student = students[0] %}
 <script>
     // Store initial student data
     var initialStudentData = {

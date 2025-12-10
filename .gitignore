@@ -23,5 +23,6 @@ Thumbs.db
 *.bak
 *.tmp
 *.swp
-*.jpg
+# *.jpg
 
+static/qrcode/
