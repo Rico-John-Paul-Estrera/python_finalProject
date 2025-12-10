@@ -1,8 +1,8 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div style="display: flex; align-items: center; justify-content: center; min-height: calc(95vh - 100px);">
-    <div class="w3-card-4 w3-padding" style="background-color: #373a36; max-width: 400px; width: 90%;">
+<div style="display: flex; align-items: center; justify-content: center; min-height: calc(95vh - 100px); padding: 15px; box-sizing: border-box;">
+    <div class="w3-card-4 w3-padding" style="background-color: #373a36; max-width: 400px; width: 100%;">
         <h3 class="w3-center w3-text-orange">ADMIN LOGIN</h3>
         
         <form method="POST" action="{{ url_for('admin_login') }}">

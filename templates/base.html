@@ -19,6 +19,120 @@
 
         /* Fallback for any remaining elements */
         * { font-family: 'Poppins', sans-serif; }
+
+        /* Hamburger menu - hidden by default on desktop */
+        .hamburger-menu {
+            display: none;
+            position: fixed;
+            top: 10px;
+            left: 6px;
+            z-index: 1001;
+            cursor: pointer;
+            background-color: #d48166;
+            padding: 8px 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+
+        .hamburger-menu span {
+            display: block;
+            width: 22px;
+            height: 2px;
+            background-color: rgba(255, 255, 255, 0.9);
+            margin: 4px 0;
+            transition: 0.3s;
+        }
+
+        .mobile-sidebar {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: -250px;
+            width: 250px;
+            height: 100%;
+            background-color: #373a36;
+            z-index: 999;
+            transition: left 0.3s;
+            overflow-y: auto;
+        }
+
+        .mobile-sidebar.active {
+            left: 0;
+        }
+
+        .mobile-sidebar .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 30px;
+            color: rgba(255, 255, 255, 0.747);
+            cursor: pointer;
+        }
+
+        .mobile-sidebar .w3-button {
+            width: 100%;
+            text-align: left;
+            margin-top: 10px;
+        }
+
+        /* Responsive styles */
+        @media (max-width: 768px) {
+            .hamburger-menu {
+                display: block;
+            }
+
+            .mobile-sidebar,
+            .mobile-sidebar-overlay {
+                display: block;
+            }
+
+            .sidebar {
+                display: none !important;
+            }
+
+            .main-content {
+                width: 100% !important;
+                padding: 10px !important;
+                margin-top: 0 !important;
+            }
+
+            .w3-bar {
+                padding-left: 50px !important;
+            }
+
+            .w3-row-padding {
+                display: flex;
+                flex-direction: column;
+                padding-top: 10px;
+            }
+            .w3-half, .w3-col {
+                width: 100% !important;
+                margin-left: 0 !important;
+                margin-bottom: 15px;
+            }
+            .w3-table {
+                font-size: 12px;
+            }
+            .w3-table th, .w3-table td {
+                padding: 6px 4px !important;
+            }
+            h3, h4 {
+                font-size: 18px !important;
+            }
+            .w3-bar h4 {
+                font-size: 13px !important;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .w3-table {
+                font-size: 10px;
+            }
+            .w3-button {
+                padding: 8px 12px !important;
+                font-size: 12px !important;
+            }
+        }
     </style>
 </head>
 <body>

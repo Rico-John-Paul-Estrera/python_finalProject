@@ -1,9 +1,30 @@
 {% extends 'base.html' %}
 
 {% block content%}
+<!-- Hamburger Menu -->
+<div class="hamburger-menu" onclick="toggleMobileSidebar()">
+    <span></span>
+    <span></span>
+    <span></span>
+</div>
+
+<!-- Mobile Sidebar Overlay -->
+<div class="mobile-sidebar-overlay" onclick="closeMobileSidebar()"></div>
+
+<!-- Mobile Sidebar -->
+<div class="mobile-sidebar" id="mobileSidebar">
+    <span class="close-btn" onclick="closeMobileSidebar()">&times;</span>
+    <div class="w3-container w3-padding" style="margin-top: 40px;">
+        <a href="{{ url_for('user_management') }}" class="w3-button w3-block w3-margin-top w3-round" style="background-color: #d48166; color: rgba(255, 255, 255, 0.747);">USER MANAGEMENT</a>
+        <a href="{{ url_for('student_management') }}" class="w3-button w3-block w3-margin-top w3-round" style="background-color: #d48166; color: rgba(255, 255, 255, 0.747);">STUDENT MANAGEMENT</a>
+        <a href="{{ url_for('view_attendance') }}" class="w3-button w3-block w3-margin-top w3-round" style="background-color: #d48166; color: rgba(255, 255, 255, 0.747);">VIEW ATTENDANCE</a>
+        <a href="{{ url_for('logout') }}" class="w3-button w3-block w3-margin-top w3-round" style="background-color: #d48166; color: rgba(255, 255, 255, 0.747);">LOGOUT</a>
+    </div>
+</div>
+
 <div class="w3-row">
     <!-- Sidebar -->
-    <div class="w3-col" style="width: 230px; background-color: #373a36; min-height: 100vh;">
+    <div class="w3-col sidebar" style="width: 230px; background-color: #373a36; min-height: 100vh;">
         <div class="w3-container w3-padding">
             <a href="{{ url_for('user_management') }}" class="w3-button w3-block w3-margin-top w3-round" style="background-color: #d48166; color: rgba(255, 255, 255, 0.747); white-space: nowrap; padding-left: 8px; padding-right: 8px;">USER MANAGEMENT</a>
             <a href="{{ url_for('student_management') }}" class="w3-button w3-block w3-margin-top w3-round" style="background-color: #d48166; color: rgba(255, 255, 255, 0.747); white-space: nowrap; padding-left: 8px; padding-right: 8px;">STUDENT MANAGEMENT</a>
@@ -13,13 +34,13 @@
     </div>
     
     <!-- Main Content -->
-    <div class="w3-rest">
+    <div class="w3-rest main-content">
         <div class="w3-container w3-padding">
-            <div class="w3-row">
-                <div class="w3-col" style="width: 70%;">
+            <div class="w3-row" style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px;">
+                <div class="w3-col" style="flex: 1; min-width: 200px;">
                     <h3>VIEW ATTENDANCE</h3>
                 </div>
-                <div class="w3-col" style="width: 30%; text-align: right; padding-top: 15px;">
+                <div class="w3-col" style="flex: 0 0 auto; text-align: right;">
                     <form method="GET" style="display: inline-flex; align-items: center;">
                         <label style="margin-right: 10px;">SELECT DATE</label>
                         <input type="date" name="date" class="w3-input w3-border" value="{{ date_filter }}" style="width: 200px; display: inline-block;">
@@ -28,7 +49,8 @@
                 </div>
             </div>
             
-            <table class="w3-table-all w3-hoverable w3-margin-top">
+            <div style="overflow-x: auto;">
+            <table class="w3-table-all w3-hoverable w3-margin-top" style="min-width: 600px;">
                 <thead>
                     <tr style="background-color: #a0aecd; color: #000000;">
                         <th>#</th>
@@ -60,7 +82,24 @@
                     {% endif %}
                 </tbody>
             </table>
+            </div>
         </div>
     </div>
 </div>
+
+<script>
+function toggleMobileSidebar() {
+    var sidebar = document.getElementById('mobileSidebar');
+    var overlay = document.querySelector('.mobile-sidebar-overlay');
+    sidebar.classList.toggle('active');
+    overlay.style.display = sidebar.classList.contains('active') ? 'block' : 'none';
+}
+
+function closeMobileSidebar() {
+    var sidebar = document.getElementById('mobileSidebar');
+    var overlay = document.querySelector('.mobile-sidebar-overlay');
+    sidebar.classList.remove('active');
+    overlay.style.display = 'none';
+}
+</script>
 {% endblock %}

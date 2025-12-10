@@ -1,9 +1,30 @@
 {% extends 'base.html' %}
 
 {% block content%}
+<!-- Hamburger Menu -->
+<div class="hamburger-menu" onclick="toggleMobileSidebar()">
+    <span></span>
+    <span></span>
+    <span></span>
+</div>
+
+<!-- Mobile Sidebar Overlay -->
+<div class="mobile-sidebar-overlay" onclick="closeMobileSidebar()"></div>
+
+<!-- Mobile Sidebar -->
+<div class="mobile-sidebar" id="mobileSidebar">
+    <span class="close-btn" onclick="closeMobileSidebar()">&times;</span>
+    <div class="w3-container w3-padding" style="margin-top: 40px;">
+        <a href="{{ url_for('user_management') }}" class="w3-button w3-block w3-margin-top w3-round" style="background-color: #d48166; color: rgba(255, 255, 255, 0.747);">USER MANAGEMENT</a>
+        <a href="{{ url_for('student_management') }}" class="w3-button w3-block w3-margin-top w3-round" style="background-color: #d48166; color: rgba(255, 255, 255, 0.747);">STUDENT MANAGEMENT</a>
+        <a href="{{ url_for('view_attendance') }}" class="w3-button w3-block w3-margin-top w3-round" style="background-color: #d48166; color: rgba(255, 255, 255, 0.747);">VIEW ATTENDANCE</a>
+        <a href="{{ url_for('logout') }}" class="w3-button w3-block w3-margin-top w3-round" style="background-color: #d48166; color: rgba(255, 255, 255, 0.747);">LOGOUT</a>
+    </div>
+</div>
+
 <div class="w3-row">
     <!-- Sidebar -->
-    <div class="w3-col" style="width: 230px; background-color: #373a36; min-height: 100vh;">
+    <div class="w3-col sidebar" style="width: 230px; background-color: #373a36; min-height: 100vh;">
         <div class="w3-container w3-padding">
             <a href="{{ url_for('user_management') }}" class="w3-button w3-block w3-margin-top w3-round" style="background-color: #d48166; color: rgba(255, 255, 255, 0.747); white-space: nowrap; padding-left: 8px; padding-right: 8px;">USER MANAGEMENT</a>
             <a href="{{ url_for('student_management') }}" class="w3-button w3-block w3-margin-top w3-round" style="background-color: #d48166; color: rgba(255, 255, 255, 0.747); white-space: nowrap; padding-left: 8px; padding-right: 8px;">STUDENT MANAGEMENT</a>
@@ -13,10 +34,10 @@
     </div>
     
     <!-- Main Content -->
-    <div class="w3-rest">
+    <div class="w3-rest main-content">
         <div class="w3-container w3-padding">
             <div class="w3-row w3-margin-bottom">
-                <div class="w3-col m12" style="display: flex; align-items: center; justify-content: space-between;">
+                <div class="w3-col m12" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
                     <h3 style="margin: 0;">USER MANAGEMENT</h3>
                     <button class="w3-button w3-round" style="background-color: #4d724d; color: #f5f5f5" onclick="openAddAdminModal()">Add New Admin</button>
                 </div>
@@ -46,8 +67,8 @@
                 </div>
                 
                 <!-- User List Table -->
-                <div class="w3-rest" style="margin-left: 20px;">
-                    <table class="w3-table-all w3-hoverable">
+                <div class="w3-rest" style="margin-left: 20px; overflow-x: auto;">
+                    <table class="w3-table-all w3-hoverable" style="min-width: 500px;">
                         <thead>
                             <tr style="background-color: #a0aecd; color: #000000;">
                                 <th style="text-align: center;">ID</th>
@@ -85,6 +106,20 @@
 </div>
 
 <script>
+function toggleMobileSidebar() {
+    var sidebar = document.getElementById('mobileSidebar');
+    var overlay = document.querySelector('.mobile-sidebar-overlay');
+    sidebar.classList.toggle('active');
+    overlay.style.display = sidebar.classList.contains('active') ? 'block' : 'none';
+}
+
+function closeMobileSidebar() {
+    var sidebar = document.getElementById('mobileSidebar');
+    var overlay = document.querySelector('.mobile-sidebar-overlay');
+    sidebar.classList.remove('active');
+    overlay.style.display = 'none';
+}
+
 // Add event listeners to all edit buttons
 document.addEventListener('DOMContentLoaded', function() {
     var editButtons = document.querySelectorAll('.edit-user-btn');
@@ -128,6 +163,15 @@ window.onclick = function(event) {
         modal.style.display = 'none';
     }
 }
+
+// close mobile sidebar when any mobile menu link is clicked
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('#mobileSidebar a').forEach(function(link) {
+        link.addEventListener('click', function() {
+            closeMobileSidebar();
+        });
+    });
+});
 </script>
 
 <!-- Modal for Adding New Admin -->
