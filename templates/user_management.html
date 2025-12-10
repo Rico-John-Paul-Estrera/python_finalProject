@@ -3,12 +3,12 @@
 {% block content%}
 <div class="w3-row">
     <!-- Sidebar -->
-    <div class="w3-col" style="width: 230px; background-color: #a0aecd; min-height: 100vh;">
+    <div class="w3-col" style="width: 230px; background-color: #373a36; min-height: 100vh;">
         <div class="w3-container w3-padding">
-            <a href="{{ url_for('user_management') }}" class="w3-button w3-block w3-white w3-margin-top w3-round" style="white-space: nowrap; padding-left: 8px; padding-right: 8px;">USER MANAGEMENT</a>
-            <a href="{{ url_for('student_management') }}" class="w3-button w3-block w3-white w3-margin-top w3-round" style="white-space: nowrap; padding-left: 8px; padding-right: 8px;">STUDENT MANAGEMENT</a>
-            <a href="{{ url_for('view_attendance') }}" class="w3-button w3-block w3-white w3-margin-top w3-round" style="white-space: normal; padding-left: 8px; padding-right: 8px;">VIEW ATTENDANCE</a>
-            <a href="{{ url_for('logout') }}" class="w3-button w3-block w3-white w3-margin-top w3-round" style="white-space: normal; padding-left: 8px; padding-right: 8px;">LOGOUT</a>
+            <a href="{{ url_for('user_management') }}" class="w3-button w3-block w3-margin-top w3-round" style="background-color: #d48166; color: rgba(255, 255, 255, 0.747); white-space: nowrap; padding-left: 8px; padding-right: 8px;">USER MANAGEMENT</a>
+            <a href="{{ url_for('student_management') }}" class="w3-button w3-block w3-margin-top w3-round" style="background-color: #d48166; color: rgba(255, 255, 255, 0.747); white-space: nowrap; padding-left: 8px; padding-right: 8px;">STUDENT MANAGEMENT</a>
+            <a href="{{ url_for('view_attendance') }}" class="w3-button w3-block w3-margin-top w3-round" style="background-color: #d48166; color: rgba(255, 255, 255, 0.747); white-space: nowrap; padding-left: 8px; padding-right: 8px;">VIEW ATTENDANCE</a>
+            <a href="{{ url_for('logout') }}" class="w3-button w3-block w3-margin-top w3-round" style="background-color: #d48166; color: rgba(255, 255, 255, 0.747); white-space: nowrap; padding-left: 8px; padding-right: 8px;">LOGOUT</a>
         </div>
     </div>
     
@@ -18,7 +18,7 @@
             <div class="w3-row w3-margin-bottom">
                 <div class="w3-col m12" style="display: flex; align-items: center; justify-content: space-between;">
                     <h3 style="margin: 0;">USER MANAGEMENT</h3>
-                    <button class="w3-button w3-cyan w3-round" onclick="openAddAdminModal()">Add New Admin</button>
+                    <button class="w3-button w3-round" style="background-color: #4d724d; color: #f5f5f5" onclick="openAddAdminModal()">Add New Admin</button>
                 </div>
             </div>
             
@@ -39,6 +39,7 @@
                             </p>
                             <p class="w3-center">
                                 <button type="submit" class="w3-button w3-indigo w3-round" style="min-width: 100px;">SAVE</button>
+                                <button type="button" class="w3-button w3-round" style="min-width: 100px; margin-left: 10px; background-color: #ced4da;" onclick="clearForm()">CLEAR</button>
                             </p>
                         </form>
                     </div>
@@ -48,7 +49,7 @@
                 <div class="w3-rest" style="margin-left: 20px;">
                     <table class="w3-table-all w3-hoverable">
                         <thead>
-                            <tr class="w3-indigo">
+                            <tr style="background-color: #a0aecd; color: #000000;">
                                 <th style="text-align: center;">ID</th>
                                 <th>NAME</th>
                                 <th>EMAIL</th>
@@ -64,11 +65,11 @@
                                 <td>{{ user['email'] }}</td>
                                 <td style="text-align: center;">********</td>
                                 <td style="text-align: center;">
-                                    <button class="w3-button w3-small w3-white w3-border edit-user-btn" data-id="{{ user['id'] }}" data-email="{{ user['email'] }}" data-name="{{ user['name'] }}">
-                                        ✏️
+                                    <button class="w3-button w3-small w3-info w3-border edit-user-btn" data-id="{{ user['id'] }}" data-email="{{ user['email'] }}" data-name="{{ user['name'] }}" style="font-size: 18px;">
+                                            ✏️
                                     </button>
-                                    <form method="POST" action="{{ url_for('delete_user_route', user_id=user['id']) }}" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this user?');">
-                                        <button type="submit" class="w3-button w3-small w3-white w3-border">
+                                    <form method="POST" action="{{ url_for('delete_user_route', user_id=user['id']) }}" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this admin?');">
+                                        <button type="submit" class="w3-button w3-small w3-danger w3-border">
                                             🗑️
                                         </button>
                                     </form>
@@ -105,6 +106,12 @@ function editUser(id, email, name) {
     document.getElementById('password').placeholder = 'Enter new password';
 }
 
+function clearForm() {
+    document.getElementById('userForm').reset();
+    document.getElementById('user_id').value = '';
+    document.getElementById('password').placeholder = 'password';
+}
+
 // Modal functions
 function openAddAdminModal() {
     document.getElementById('addAdminModal').style.display = 'block';
@@ -126,9 +133,9 @@ window.onclick = function(event) {
 <!-- Modal for Adding New Admin -->
 <div id="addAdminModal" class="w3-modal" style="display: none;">
     <div class="w3-modal-content w3-card-4 w3-animate-zoom" style="max-width: 400px; margin-top: 100px;">
-        <div class="w3-container w3-indigo w3-padding">
-            <span onclick="closeAddAdminModal()" class="w3-button w3-display-topright" style="font-size: 20px; cursor: pointer;">&times;</span>
-            <h4 style="color: white; margin: 0;">Add New Admin</h4>
+        <div class="w3-container w3-padding" style="background-color: #a0aecd;">
+            <span onclick="closeAddAdminModal()" class="w3-button w3-display-topright" style="font-size: 20px; cursor: pointer; background-color: #a0aecd; color: #000000"><b>&times;</b></span>
+            <h4 style="color: #000000; margin: 0;"><b>ADD NEW ADMIN</b></h4> 
         </div>
         <form method="POST" action="{{ url_for('save_user') }}" class="w3-container w3-padding">
             <p>
@@ -145,7 +152,7 @@ window.onclick = function(event) {
             </p>
             <p class="w3-center w3-margin-top">
                 <button type="submit" class="w3-button w3-indigo w3-round w3-margin-right">SAVE</button>
-                <button type="button" class="w3-button w3-light-gray w3-round" onclick="closeAddAdminModal()">CANCEL</button>
+                <button type="button" class="w3-button w3-round" style="background-color: #ced4da;" onclick="closeAddAdminModal()">CANCEL</button>
             </p>
         </form>
     </div>

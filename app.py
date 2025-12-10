@@ -74,12 +74,12 @@ def save_user():
     try:
         if user_id:
             if update_user(user_id, email, password, name):
-                flash('User updated successfully!', 'success')
+                flash('Admin updated successfully!', 'success')
             else:
                 flash('Email already exists', 'danger')
         else:
             if create_user(email, password, name):
-                flash('User created successfully!', 'success')
+                flash('Admin created successfully!', 'success')
             else:
                 flash('Email already exists', 'danger')
     except Exception as e:
@@ -96,7 +96,7 @@ def delete_user_route(user_id):
         return redirect(url_for('user_management'))
     
     delete_user(user_id)
-    flash('User deleted successfully!', 'success')
+    flash('Admin deleted successfully!', 'success')
     return redirect(url_for('user_management'))
 
 @app.route('/admin/students')

@@ -3,12 +3,12 @@
 {% block content%}
 <div class="w3-row">
     <!-- Sidebar -->
-    <div class="w3-col" style="width: 230px; background-color: #00bcd4; min-height: 100vh;">
+    <div class="w3-col" style="width: 230px; background-color: #373a36; min-height: 100vh;">
         <div class="w3-container w3-padding">
-            <a href="{{ url_for('user_management') }}" class="w3-button w3-block w3-white w3-margin-top w3-round" style="white-space: nowrap; padding-left: 8px; padding-right: 8px;">USER MANAGEMENT</a>
-            <a href="{{ url_for('student_management') }}" class="w3-button w3-block w3-white w3-margin-top w3-round" style="white-space: nowrap; padding-left: 8px; padding-right: 8px;">STUDENT MANAGEMENT</a>
-            <a href="{{ url_for('view_attendance') }}" class="w3-button w3-block w3-white w3-margin-top w3-round" style="white-space: normal; padding-left: 8px; padding-right: 8px;">VIEW ATTENDANCE</a>
-            <a href="{{ url_for('logout') }}" class="w3-button w3-block w3-white w3-margin-top w3-round" style="white-space: normal; padding-left: 8px; padding-right: 8px;">LOGOUT</a>
+            <a href="{{ url_for('user_management') }}" class="w3-button w3-block w3-margin-top w3-round" style="background-color: #d48166; color: rgba(255, 255, 255, 0.747); white-space: nowrap; padding-left: 8px; padding-right: 8px;">USER MANAGEMENT</a>
+            <a href="{{ url_for('student_management') }}" class="w3-button w3-block w3-margin-top w3-round" style="background-color: #d48166; color: rgba(255, 255, 255, 0.747); white-space: nowrap; padding-left: 8px; padding-right: 8px;">STUDENT MANAGEMENT</a>
+            <a href="{{ url_for('view_attendance') }}" class="w3-button w3-block w3-margin-top w3-round" style="background-color: #d48166; color: rgba(255, 255, 255, 0.747); white-space: nowrap; padding-left: 8px; padding-right: 8px;">VIEW ATTENDANCE</a>
+            <a href="{{ url_for('logout') }}" class="w3-button w3-block w3-margin-top w3-round" style="background-color: #d48166; color: rgba(255, 255, 255, 0.747); white-space: nowrap; padding-left: 8px; padding-right: 8px;">LOGOUT</a>
         </div>
     </div>
     
@@ -23,14 +23,14 @@
                     <form method="GET" style="display: inline-flex; align-items: center;">
                         <label style="margin-right: 10px;">SELECT DATE</label>
                         <input type="date" name="date" class="w3-input w3-border" value="{{ date_filter }}" style="width: 200px; display: inline-block;">
-                        <button type="submit" class="w3-button w3-cyan w3-round" style="margin-left: 10px;">GO</button>
+                        <button type="submit" class="w3-button w3-round" style="margin-left: 10px; background-color: #4d724d; color: #f5f5f5">GO</button>
                     </form>
                 </div>
             </div>
             
             <table class="w3-table-all w3-hoverable w3-margin-top">
                 <thead>
-                    <tr class="w3-indigo">
+                    <tr style="background-color: #a0aecd; color: #000000;">
                         <th>#</th>
                         <th>IDNO</th>
                         <th>LASTNAME</th>

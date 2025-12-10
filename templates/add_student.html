@@ -1,25 +1,16 @@
 {% extends 'base.html' %}
 
 {% block navbar_right %}
-<a href="{{ url_for('logout') }}" class="w3-bar-item w3-button w3-right">LOGOUT</a>
+<a href="{{ url_for('student_management') }}" class="w3-bar-item w3-button w3-right w3-round" style="background-color: #d48166; color: rgba(255, 255, 255, 0.747); white-space: nowrap; padding-left: 8px; padding-right: 8px;">RETURN</a>
 {% endblock %}
 
 {% block content %}
 <div class="w3-row">
-    <!-- Sidebar -->
-   <div class="w3-col" style="width: 230px; background-color: #00bcd4; min-height: 100vh;">
-        <div class="w3-container w3-padding">
-            <a href="{{ url_for('user_management') }}" class="w3-button w3-block w3-white w3-margin-top w3-round" style="white-space: nowrap; padding-left: 8px; padding-right: 8px;">USER MANAGEMENT</a>
-            <a href="{{ url_for('student_management') }}" class="w3-button w3-block w3-white w3-margin-top w3-round" style="white-space: nowrap; padding-left: 8px; padding-right: 8px;">STUDENT MANAGEMENT</a>
-            <a href="{{ url_for('view_attendance') }}" class="w3-button w3-block w3-white w3-margin-top w3-round" style="white-space: normal; padding-left: 8px; padding-right: 8px;">VIEW ATTENDANCE</a>
-            <a href="{{ url_for('logout') }}" class="w3-button w3-block w3-white w3-margin-top w3-round" style="white-space: normal; padding-left: 8px; padding-right: 8px;">LOGOUT</a>
-        </div>
+    <!-- Main Content -->
+    <div class="w3-col m10 w3-padding" style="display: flex; flex-direction: column; align-items: flex-start;">
+        <h4 class="w3-left" style="margin: 0; padding-left: 0;">ADD/UPDATE STUDENT</h4>
     </div>
 
-    <!-- Main Content -->
-    <div class="w3-col m10 w3-padding">
-        <h3>ADD/UPDATE STUDENT</h3>
-        
         <div class="w3-row-padding">
             <!-- Left Panel - Camera and Form -->
             <div class="w3-half">
@@ -62,7 +53,7 @@
                         </select>
                     </p>
                     <p class="w3-center">
-                        <button class="w3-button w3-blue w3-round" onclick="takepicture()">SNAP</button>
+                        <button class="w3-button w3-cyan w3-round" onclick="takepicture()">SNAP</button>
                     </p>
                 </div>
             </div>
@@ -98,7 +89,7 @@
 
                     <br>
                     <center>
-                        <button class="w3-button w3-cyan w3-round w3-margin-top" onclick="saveStudent()">SAVE</button>
+                        <button class="w3-button w3-indigo w3-round w3-margin-top" onclick="saveStudent()">SAVE</button>
                     </center>
                 </div>
             </div>
