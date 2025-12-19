@@ -36,11 +36,9 @@
     <!-- Main Content -->
     <div class="w3-rest main-content">
         <div class="w3-container w3-padding">
-            <div class="w3-row" style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px;">
-                <div class="w3-col" style="flex: 1; min-width: 200px;">
-                    <h3>STUDENT MANAGEMENT</h3>
-                </div>
-                <div class="w3-col" style="flex: 0 0 auto; text-align: right;">
+            <div class="w3-row w3-margin-bottom">
+                <div class="w3-col m12" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+                    <h3 style="margin: 0;">STUDENT MANAGEMENT</h3>
                     <a href="{{ url_for('add_student') }}" class="w3-button w3-round" style="background-color: #4d724d; color: #f5f5f5">ADD NEW STUDENT</a>
                 </div>
             </div>

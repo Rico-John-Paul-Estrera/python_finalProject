@@ -1,7 +1,11 @@
 {% extends 'base.html' %}
 
+{% block navbar_right %}
+<a href="{{ url_for('index') }}" class="w3-bar-item w3-button w3-right w3-round" style="background-color: #d48166; color: rgba(255, 255, 255, 0.747);">BACK</a>
+{% endblock %}
+
 {% block content %}
-<div style="display: flex; align-items: center; justify-content: center; min-height: calc(95vh - 100px); padding: 15px; box-sizing: border-box;">
+<div style="display: flex; align-items: center; justify-content: center; min-height: calc(93vh - 100px); padding: 15px; box-sizing: border-box;">
     <div class="w3-card-4 w3-padding" style="background-color: #373a36; max-width: 400px; width: 100%;">
         <h3 class="w3-center w3-text-orange">ADMIN LOGIN</h3>
         

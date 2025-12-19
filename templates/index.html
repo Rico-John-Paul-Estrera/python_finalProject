@@ -6,10 +6,10 @@
 
 {% block content%}
 <br>
-<div class="page-center" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:calc(89vh - 70px);padding:20px;box-sizing:border-box;">
+<div class="page-center" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:calc(85vh - 70px);padding:20px;box-sizing:border-box;">
     <h3 style="text-align:center;margin:0 0 16px 0;">QRCode Reader Viewer</h3>
-    <div class="w3-card-4" style="max-width: 600px; width:100%; margin: 0 auto; padding: 15px; box-sizing:border-box;">
-        <div id="reader" style="width: 100%;"></div>
+    <div class="w3-card-4" style="max-width: 500px; width:70%; margin: 0 auto; padding: 15px; box-sizing:border-box;">
+        <div id="reader" style="width: 90%; margin: 0 auto;"></div>
     </div>
 </div>
 
@@ -24,7 +24,7 @@
         </center>
         
         <div id="status-message" style="text-align: center; font-size: 18px; font-weight: bold; color: #00bcd4; margin-bottom: 20px; display: none;"></div>
-        
+        ..
         <table class="w3-table w3-bordered w3-margin-top" style="text-align: center;">
             <tr><td style="padding: 10px; font-weight: bold; width: 50%; text-align: center;">IDNO</td><td style="padding: 10px; text-align: center;" id="display-idno">-</td></tr>
             <tr><td style="padding: 10px; font-weight: bold; width: 50%; text-align: center;">LASTNAME</td><td style="padding: 10px; text-align: center;" id="display-lastname">-</td></tr>
@@ -33,9 +33,9 @@
             <tr><td style="padding: 10px; font-weight: bold; width: 50%; text-align: center;">LEVEL</td><td style="padding: 10px; text-align: center;" id="display-level">-</td></tr>
         </table>
         
-        <center>
+        <!-- <center>
             <button class="w3-button w3-round w3-margin-top" style="background-color: #ced4da; color: #000000;" onclick="closeStudentModal()">CLOSE</button>
-        </center>
+        </center> -->
     </div>
 </div>
 
@@ -43,6 +43,8 @@
 <script>
     function openStudentModal() {
         document.getElementById('student-modal').style.display = 'flex';
+        // Auto-close after 3 seconds
+        setTimeout(closeStudentModal, 3000);
     }
 
     function closeStudentModal() {

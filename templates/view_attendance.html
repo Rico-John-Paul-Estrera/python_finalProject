@@ -36,11 +36,9 @@
     <!-- Main Content -->
     <div class="w3-rest main-content">
         <div class="w3-container w3-padding">
-            <div class="w3-row" style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px;">
-                <div class="w3-col" style="flex: 1; min-width: 200px;">
-                    <h3>VIEW ATTENDANCE</h3>
-                </div>
-                <div class="w3-col" style="flex: 0 0 auto; text-align: right;">
+            <div class="w3-row w3-margin-bottom">
+                <div class="w3-col m12" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+                    <h3 style="margin: 0;">VIEW ATTENDANCE</h3>
                     <form method="GET" style="display: inline-flex; align-items: center;">
                         <label style="margin-right: 10px;">SELECT DATE</label>
                         <input type="date" name="date" class="w3-input w3-border" value="{{ date_filter }}" style="width: 200px; display: inline-block;">
